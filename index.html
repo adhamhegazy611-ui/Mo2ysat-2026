@@ -2,6 +2,7 @@
 <html lang="ar" dir="rtl" data-theme="light"><head><meta charset="utf-8">
 <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
 <title>متابعة المقايسات</title>
+<link rel="icon" type="image/png" sizes="32x32" href="/icons/icon-32.png"><link rel="icon" type="image/png" sizes="48x48" href="/icons/icon-48.png"><link rel="icon" type="image/png" sizes="192x192" href="/icons/icon-192.png"><link rel="apple-touch-icon" sizes="180x180" href="/icons/apple-touch-icon.png"><link rel="manifest" href="/manifest.webmanifest"><meta name="theme-color" content="#1e3a8a"><meta name="apple-mobile-web-app-title" content="مقايسات">
 <link rel="preconnect" href="https://fonts.googleapis.com"><link rel="preconnect" href="https://fonts.gstatic.com" crossorigin><link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Cairo:wght@400;600;700&display=swap">
 <style>
 :root{box-sizing:border-box;padding-top:env(safe-area-inset-top,0px);padding-bottom:env(safe-area-inset-bottom,0px);--bg:#eef2f7;--card:#fff;--tx:#14213d;--mu:#64748b;--bd:#dbe3ee;--ac:#0f766e;--acx:#fff;--redbg:#fee2e2;--redtx:#b91c1c;--ok:#15803d}
@@ -250,6 +251,17 @@ function idleSetup(){let w=0;const touch=()=>{const n=Date.now();if(n-w>15000){w
  const chk=()=>{const l=+ssGet('lastAct')||Date.now();if(Date.now()-l>IDLE_MIN*60000)idleOut()};
  setInterval(chk,30000);document.addEventListener('visibilitychange',()=>{if(!document.hidden)chk()})}
 let ME={id:null,username:'',role:'viewer',perms:{}};
+/* مراقبة الحساب: لو المسؤول وقفه يتطرد فورًا، ولو غيّر صلاحياته تتطبّق على طول */
+async function kick(msg){try{await sb.auth.signOut()}catch(e){}ssSet('kicked',msg);location.reload()}
+function watchAccount(){let busy=0;
+ const chk=async()=>{if(busy||document.hidden)return;busy=1;try{
+  const{data,error}=await sb.from('app_users').select('role,perms').eq('user_id',ME.id).maybeSingle();
+  if(!error&&!data)return kick('⛔ تم إيقاف حسابك من المسؤول. لو ده حصل بالغلط كلّم المسؤول.');
+  if(!error&&data&&(data.role!==ME.role||JSON.stringify(data.perms||{})!==JSON.stringify(ME.perms||{}))){ssSet('permsChanged','1');location.reload()}
+  const{data:u}=await sb.auth.getUser();if(!u||!u.user)return kick('انتهت الجلسة، ادخل تاني.');
+ }catch(e){}finally{busy=0}};
+ setInterval(chk,20000);document.addEventListener('visibilitychange',()=>{if(!document.hidden)chk()});
+ try{sb.channel('me-watch').on('postgres_changes',{event:'*',schema:'public',table:'app_users'},chk).subscribe()}catch(e){}}
 const can=k=>ME.role==='admin'||!!(ME.perms&&ME.perms[k]);
 let resolveDb;const dbReady=new Promise(r=>resolveDb=r);
 window.claude={use:()=>dbReady};
@@ -271,7 +283,8 @@ async function enter(session,resumed){
  if(me){({data:m}=await sb.from('app_users').select('username,role').eq('user_id',uid).maybeSingle());if(m)m.perms={add:true,edit:true,del:true,export:true}}
  if(!m){await sb.auth.signOut();$l('lerr').textContent='حسابك مش مفعّل أو لسه مستني موافقة المسؤول';return}
  ME={id:uid,username:m.username,role:m.role,perms:m.perms||{}};
- idleSetup();
+ idleSetup();watchAccount();
+ if(ssGet('permsChanged')){try{sessionStorage.removeItem('permsChanged')}catch(e){}setTimeout(()=>alert('المسؤول عدّل صلاحيات حسابك، واتطبّقت دلوقتي.'),800)}
  if(!can('add'))$l('addb').hidden=true;if(!can('export'))$l('exportExcel').hidden=true;
  document.body.classList.add('in');$l('lgn').remove();
  const hd=document.querySelector('.hd');
@@ -296,7 +309,8 @@ async function doLogin(){
 }
 document.addEventListener('DOMContentLoaded',async()=>{
  $l('lb').onclick=doLogin;$l('lp').onkeydown=e=>{if(e.key==='Enter')doLogin()};$l('lu').onkeydown=e=>{if(e.key==='Enter')$l('lp').focus()};
- if(ssGet('idleOut')){$l('lerr').textContent='اتعملك خروج تلقائي بعد '+IDLE_MIN+' دقيقة من غير استخدام. ادخل تاني.';try{sessionStorage.removeItem('idleOut')}catch(e){}}
+ if(ssGet('kicked')){$l('lerr').textContent=ssGet('kicked');try{sessionStorage.removeItem('kicked')}catch(e){}}
+ else if(ssGet('idleOut')){$l('lerr').textContent='اتعملك خروج تلقائي بعد '+IDLE_MIN+' دقيقة من غير استخدام. ادخل تاني.';try{sessionStorage.removeItem('idleOut')}catch(e){}}
  const{data}=await sb.auth.getSession();if(data.session)enter(data.session,true);
 });
 </script>
