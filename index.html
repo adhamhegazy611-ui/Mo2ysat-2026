@@ -65,6 +65,13 @@ tbody tr.late td:first-child{border-right:4px solid #b91c1c}
 .mdl h2{margin:0 0 12px;font-size:18px}.mdl input{width:100%;margin-bottom:10px;padding:10px 12px;font-size:15px}.mdl .mm{min-height:20px;font-size:14px;margin-bottom:8px;color:var(--redtx)}.mdl .mm.ok{color:var(--ok)}
 .mdl .ac{display:flex;gap:8px}.mdl .ac button{flex:1;padding:10px}
 .rq{display:flex;align-items:center;justify-content:space-between;gap:8px;border:1px solid var(--bd);border-radius:10px;padding:10px 12px;margin-bottom:8px}.rq b{font-size:15px}.rq small{display:block;color:var(--mu)}.rq .ac{flex:none}.rq .ac button{padding:6px 12px;flex:none}
+.mdl .bx.wide{max-width:580px}.mdl h3{font-size:15px;margin:16px 0 8px;color:#1e3a8a}
+.uc{border:1px solid var(--bd);border-radius:12px;padding:12px 14px;margin-bottom:10px;background:#f8fafc}.uc .t{display:flex;justify-content:space-between;align-items:center;gap:8px;flex-wrap:wrap}.uc .t small{color:var(--mu);font-weight:400}
+.uc .ht2{font-size:12px;color:var(--mu);margin-top:6px}
+.pmx{display:flex;flex-wrap:wrap;gap:8px 16px;margin:8px 0 4px}.pmx label{display:inline-flex;align-items:center;gap:6px;font-size:13px;cursor:pointer;font-weight:600}.pmx label.ad{flex-basis:100%;color:#92400e}
+.mdl .pmx input{width:17px!important;height:17px;margin:0!important;padding:0!important;accent-color:#1e40af;flex:none}
+.uc .ac{display:flex;gap:8px;margin-top:10px}.uc .ac button{flex:1;height:40px;padding:0 10px;border-radius:10px;font-weight:600}.uc .ac button.p{background:#1e40af;border-color:#1e40af;color:#fff}
+.rl{font-size:12px;border-radius:99px;padding:2px 10px;background:#e0e7ff;color:#1e3a8a;font-weight:600}
 .bdg{background:var(--redtx);color:#fff;border-radius:99px;padding:1px 8px;font-size:12px;margin-inline-start:6px}
 body{background:#4b5058!important}
 #lgn{background:linear-gradient(rgba(8,14,28,.55),rgba(8,14,28,.55)),url(login-bg.jpg) center/cover no-repeat!important}
@@ -231,7 +238,19 @@ tbody tr:not(.late):hover td{background:#f8fafc!important}
 <script>const SB_URL='https://qadrtqtydtgzachfzpqw.supabase.co';
 const SB_KEY='eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6InFhZHJ0cXR5ZHRnemFjaGZ6cHF3Iiwicm9sZSI6ImFub24iLCJpYXQiOjE3OTI1MTI5MTksImV4cCI6MjEwODA4ODkxOX0.zngPkaxJKin9rmzABnDfmkU8-OkXAAGZ8zTwae4-fkw';
 const SB_DOM='@mo2ysaat.app',SB_TBL='estimates_added';
-const sb=supabase.createClient(SB_URL,SB_KEY);
+/* الأمان: الجلسة بتتحفظ في التبويب ده بس — لو المتصفح اتقفل لازم الباسورد تاني، وخروج تلقائي بعد فترة من غير استخدام */
+const IDLE_MIN=30;
+try{Object.keys(localStorage).filter(k=>/^sb-.*-auth-token/.test(k)).forEach(k=>localStorage.removeItem(k))}catch(e){}
+let AUTH_STORE;try{sessionStorage.setItem('_t','1');sessionStorage.removeItem('_t');AUTH_STORE=sessionStorage}catch(e){AUTH_STORE=undefined}
+const sb=supabase.createClient(SB_URL,SB_KEY,{auth:{storage:AUTH_STORE,persistSession:!!AUTH_STORE,autoRefreshToken:true}});
+const ssGet=k=>{try{return sessionStorage.getItem(k)}catch(e){return null}},ssSet=(k,v)=>{try{sessionStorage.setItem(k,v)}catch(e){}};
+async function idleOut(){try{await sb.auth.signOut()}catch(e){}ssSet('idleOut','1');location.reload()}
+function idleSetup(){let w=0;const touch=()=>{const n=Date.now();if(n-w>15000){w=n;ssSet('lastAct',String(n))}};touch();
+ ['mousemove','keydown','click','touchstart','scroll','wheel'].forEach(ev=>addEventListener(ev,touch,{passive:true,capture:true}));
+ const chk=()=>{const l=+ssGet('lastAct')||Date.now();if(Date.now()-l>IDLE_MIN*60000)idleOut()};
+ setInterval(chk,30000);document.addEventListener('visibilitychange',()=>{if(!document.hidden)chk()})}
+let ME={id:null,username:'',role:'viewer',perms:{}};
+const can=k=>ME.role==='admin'||!!(ME.perms&&ME.perms[k]);
 let resolveDb;const dbReady=new Promise(r=>resolveDb=r);
 window.claude={use:()=>dbReady};
 function mkShim(){return{collection:()=>({
@@ -245,9 +264,15 @@ function mkShim(){return{collection:()=>({
   load();sb.channel('est-sync').on('postgres_changes',{event:'*',schema:'public',table:SB_TBL},load).subscribe()}
 })}}
 const $l=id=>document.getElementById(id);
-async function enter(session){
- const{data:m}=await sb.from('app_users').select('username,role').maybeSingle();
- if(!m){await sb.auth.signOut();$l('lerr').textContent='حسابك لسه مستني موافقة المسؤول';return}
+async function enter(session,resumed){
+ if(resumed){const l=+ssGet('lastAct');if(l&&Date.now()-l>IDLE_MIN*60000){await sb.auth.signOut();$l('lerr').textContent='اتعملك خروج تلقائي عشان الصفحة كانت مفتوحة من غير استخدام. ادخل تاني.';return}}
+ const uid=session.user&&session.user.id;
+ let{data:m,error:me}=await sb.from('app_users').select('username,role,perms').eq('user_id',uid).maybeSingle();
+ if(me){({data:m}=await sb.from('app_users').select('username,role').eq('user_id',uid).maybeSingle());if(m)m.perms={add:true,edit:true,del:true,export:true}}
+ if(!m){await sb.auth.signOut();$l('lerr').textContent='حسابك مش مفعّل أو لسه مستني موافقة المسؤول';return}
+ ME={id:uid,username:m.username,role:m.role,perms:m.perms||{}};
+ idleSetup();
+ if(!can('add'))$l('addb').hidden=true;if(!can('export'))$l('exportExcel').hidden=true;
  document.body.classList.add('in');$l('lgn').remove();
  const hd=document.querySelector('.hd');
  if(hd){const b=document.createElement('button');b.id='lo';b.textContent='🚪 خروج ('+m.username+')';
@@ -265,12 +290,14 @@ async function doLogin(){
  const{data,error}=await sb.auth.signInWithPassword({email:u+SB_DOM,password:p});
  $l('lb').disabled=false;
  if(error&&/not confirmed/i.test(error.message||'')){$l('lerr').textContent='حسابك لسه مستني موافقة المسؤول';return}
+ ssSet('lastAct',String(Date.now()));
  if(error||!data.session){$l('lerr').textContent='اسم المستخدم أو كلمة المرور غلط';return}
  enter(data.session)
 }
 document.addEventListener('DOMContentLoaded',async()=>{
  $l('lb').onclick=doLogin;$l('lp').onkeydown=e=>{if(e.key==='Enter')doLogin()};$l('lu').onkeydown=e=>{if(e.key==='Enter')$l('lp').focus()};
- const{data}=await sb.auth.getSession();if(data.session)enter(data.session);
+ if(ssGet('idleOut')){$l('lerr').textContent='اتعملك خروج تلقائي بعد '+IDLE_MIN+' دقيقة من غير استخدام. ادخل تاني.';try{sessionStorage.removeItem('idleOut')}catch(e){}}
+ const{data}=await sb.auth.getSession();if(data.session)enter(data.session,true);
 });
 </script>
 <script>
@@ -319,13 +346,13 @@ function setupAccountTools(m){
  const hd=document.querySelector('.hd');if(!hd)return;
  const row=document.createElement('div');row.className='hrow';
  const pw=document.createElement('button');pw.textContent='🔑 تغيير كلمة المرور';pw.onclick=openPwModal;row.appendChild(pw);
- if(m&&m.role==='admin'){const rq=document.createElement('button');rq.id='rqb';rq.innerHTML='👥 طلبات إنشاء الحساب';rq.onclick=openReqModal;row.appendChild(rq);refreshReqCount()}
+ if(m&&m.role==='admin'){const rq=document.createElement('button');rq.id='rqb';rq.innerHTML='👥 المستخدمين والطلبات';rq.onclick=openReqModal;row.appendChild(rq);refreshReqCount()}
  const lo=document.getElementById('lo');if(lo)row.appendChild(lo);
  hd.appendChild(row)}
 async function refreshReqCount(){
  const b=document.getElementById('rqb');if(!b)return;
  const{count}=await sb.from('signup_requests').select('user_id',{count:'exact',head:true}).eq('status','pending');
- b.innerHTML='👥 طلبات إنشاء الحساب'+(count?'<span class="bdg">'+count+'</span>':'')}
+ b.innerHTML='👥 المستخدمين والطلبات'+(count?'<span class="bdg">'+count+'</span>':'')}
 function openPwModal(){
  const m=openModal('<h2>🔑 تغيير كلمة المرور</h2><input id="pw0" type="password" placeholder="كلمة المرور الحالية" autocomplete="current-password"><input id="pw1" type="password" placeholder="كلمة المرور الجديدة (٨ حروف على الأقل)" autocomplete="new-password"><input id="pw2" type="password" placeholder="أعد كتابة كلمة المرور الجديدة" autocomplete="new-password"><div class="mm" id="pwm"></div><div class="ac"><button class="p" id="pws">حفظ</button><button id="pwc">إلغاء</button></div>');
  const g=i=>m.querySelector('#'+i),say=(t,ok)=>{g('pwm').textContent=t;g('pwm').className='mm'+(ok?' ok':'')};
@@ -342,20 +369,37 @@ function openPwModal(){
    if(e2){say('تعذّر تغيير كلمة المرور، جرّب تاني');g('pws').disabled=false;return}
    say('✓ تم تغيير كلمة المرور',1);setTimeout(()=>m.remove(),1200)}
   catch(e){say('تعذّر تغيير كلمة المرور، جرّب تاني');g('pws').disabled=false}}}
+const PERMS=[['add','➕ إضافة مقايسات'],['edit','✏️ تعديل'],['del','🗑️ حذف'],['export','⬇️ تحميل Excel']];
+const DEF_P={add:true,edit:true,del:false,export:true};
+const roleTxt=r=>r==='admin'?'👑 مسؤول':r==='editor'?'محرر':'مشاهدة فقط';
+function permBox(p,adm){p=p||{};return'<div class="pmx">'+PERMS.map(([k,l])=>'<label><input type="checkbox" data-k="'+k+'"'+((adm||p[k])?' checked':'')+(adm?' disabled':'')+'>'+l+'</label>').join('')+
+ '<label class="ad"><input type="checkbox" data-k="admin"'+(adm?' checked':'')+'>👑 مسؤول (كل الصلاحيات + قبول وإدارة الحسابات)</label></div>'}
+function readPerms(c){const o={};c.querySelectorAll('.pmx input[data-k]').forEach(i=>{if(i.dataset.k!=='admin')o[i.dataset.k]=i.checked});return{p:o,adm:c.querySelector('.pmx [data-k=admin]').checked}}
 async function openReqModal(){
- const m=openModal('<h2>👥 طلبات إنشاء الحساب</h2><div id="rql">جارٍ التحميل…</div><div class="mm" id="rqm"></div><div class="ac"><button id="rqx">إغلاق</button></div>');
- m.querySelector('#rqx').onclick=()=>m.remove();
- const say=(t,ok)=>{const e=m.querySelector('#rqm');e.textContent=t;e.className='mm'+(ok?' ok':'')};
- async function load(){const{data,error}=await sb.from('signup_requests').select('user_id,username,created_at').eq('status','pending').order('created_at');
-  const l=m.querySelector('#rql');if(error){l.textContent='تعذّر تحميل الطلبات';return}
-  l.innerHTML=data.length?data.map(r=>'<div class="rq"><div><b>'+escH(r.username)+'</b><small>'+new Date(r.created_at).toLocaleString('ar-EG')+'</small></div><div class="ac"><button class="p" data-a="ok" data-id="'+escH(r.user_id)+'">قبول</button><button data-a="no" data-id="'+escH(r.user_id)+'">رفض</button></div></div>').join(''):'<div class="mu" style="margin-bottom:10px">مفيش طلبات جديدة</div>';
+ const m=openModal('<h2>👥 المستخدمين والطلبات</h2><div class="mm" id="rqm"></div><h3>📨 طلبات جديدة</h3><div id="rql">جارٍ التحميل…</div><h3>✅ الحسابات المفعّلة</h3><div id="usl">جارٍ التحميل…</div><div class="ac" style="margin-top:12px"><button id="rqx">إغلاق</button></div>');
+ m.querySelector('.bx').classList.add('wide');m.querySelector('#rqx').onclick=()=>m.remove();
+ const say=(t,ok)=>{const e=m.querySelector('#rqm');e.textContent=t;e.className='mm'+(ok?' ok':'');if(t)e.scrollIntoView({block:'nearest'})};
+ async function load(){
+  const{data:rq,error:e1}=await sb.from('signup_requests').select('user_id,username,created_at').eq('status','pending').order('created_at');
+  const l=m.querySelector('#rql');
+  l.innerHTML=e1?'تعذّر تحميل الطلبات':rq.length?rq.map(r=>'<div class="uc" data-r="'+escH(r.user_id)+'"><div class="t"><b>'+escH(r.username)+'</b><small>'+new Date(r.created_at).toLocaleString('ar-EG')+'</small></div><div class="ht2">اختار يقدر يعمل إيه:</div>'+permBox(DEF_P,false)+'<div class="ac"><button class="p" data-a="ok">✓ قبول بالصلاحيات دي</button><button data-a="no">✕ رفض</button></div></div>').join(''):'<div class="mu" style="margin-bottom:6px">مفيش طلبات جديدة</div>';
+  const{data:us,error:e2}=await sb.from('app_users').select('user_id,username,role,perms').order('username');
+  const u=m.querySelector('#usl');
+  u.innerHTML=e2?'<div class="mm">لازم تشغّل ملف SQL رقم 3 (3_permissions.sql) في Supabase الأول عشان إدارة الصلاحيات تشتغل.</div>':us.map(x=>{const me=x.user_id===ME.id;
+   return'<div class="uc" data-u="'+escH(x.user_id)+'"><div class="t"><b>'+escH(x.username)+(me?' <small>(حسابك)</small>':'')+'</b><span class="rl">'+roleTxt(x.role)+'</span></div>'+permBox(x.perms,x.role==='admin')+
+   '<div class="ac"><button class="p" data-a="save">💾 حفظ الصلاحيات</button>'+(me?'':'<button data-a="off">⛔ إيقاف الحساب</button>')+'</div></div>'}).join('');
   refreshReqCount()}
- m.addEventListener('click',async e=>{const t=e.target,id=t.dataset&&t.dataset.id;if(!id)return;
-  if(t.dataset.a==='no'&&!await ask('رفض الطلب ده؟ هيتمسح الحساب.'))return;
+ m.addEventListener('change',e=>{const t=e.target;if(t.dataset.k!=='admin')return;t.closest('.pmx').querySelectorAll('input[data-k]').forEach(i=>{if(i!==t){i.disabled=t.checked;if(t.checked)i.checked=true}})});
+ m.addEventListener('click',async e=>{const t=e.target.closest('button[data-a]');if(!t)return;const c=t.closest('.uc');if(!c)return;
+  const a=t.dataset.a,id=c.dataset.r||c.dataset.u,{p,adm}=readPerms(c);
+  if(a==='no'&&!await ask('رفض الطلب ده؟ هيتمسح الحساب.'))return;
+  if(a==='off'&&!await ask('إيقاف الحساب ده؟ مش هيقدر يدخل الموقع، وهيرجع لقائمة الطلبات لو حبيت تفعّله تاني.'))return;
+  if(a==='ok'&&!adm&&!Object.values(p).some(Boolean)&&!await ask('مفيش ولا صلاحية متعلّم عليها — الحساب هيقدر يتفرج بس. تكمّل؟'))return;
   t.disabled=true;say('');
-  const{error}=await sb.rpc(t.dataset.a==='ok'?'approve_signup':'reject_signup',{p_user:id});
-  if(error){say('تعذّر تنفيذ العملية');t.disabled=false;return}
-  say(t.dataset.a==='ok'?'✓ تم قبول الحساب':'تم رفض الطلب',1);load()});
+  const call=a==='ok'?['approve_signup',{p_user:id,p_perms:p,p_admin:adm}]:a==='no'?['reject_signup',{p_user:id}]:a==='save'?['set_user_perms',{p_user:id,p_perms:p,p_admin:adm}]:['disable_user',{p_user:id}];
+  const{error}=await sb.rpc(call[0],call[1]);
+  if(error){say('تعذّر تنفيذ العملية: '+(error.message||'')+(error.details?' — '+error.details:'')+(/function|schema cache/i.test(error.message||'')?' — شغّل ملف 3_permissions.sql في Supabase':''));t.disabled=false;return}
+  say({ok:'✓ تم قبول الحساب بالصلاحيات اللي اخترتها',no:'تم رفض الطلب',save:'✓ تم حفظ الصلاحيات',off:'تم إيقاف الحساب'}[a],1);load()});
  load()}
 </script>
 <script>const BASE=[];
@@ -394,7 +438,7 @@ function draw(){const n=view.length,pc=Math.max(1,Math.ceil(n/PS));page=Math.min
 $('tb').innerHTML=view.slice(page*PS,page*PS+PS).map(r=>{const lt=r.days===null?(r.open?'<span class="mu">لم تُسلَّم بعد</span>':'<span class="mu">بدون تاريخ</span>'):r.late?`<span class="tag">${r.days} يوم – تجاوزت</span>`:`<span class="tag ok">${r.days} يوم</span>`;
 const dl=r.d&&isNaN(ts(r.d))?esc(r.d):r.d?esc(r.d):'<span class="tag">لم تُسلَّم</span>';
 const fl=r.f?String(r.f).split('\\').pop():'';
-return`<tr class="${r.late?'late':''}"><td>${esc(r.n)}</td><td>${esc(r.c)}</td><td>${esc(r.p)}</td><td>${esc(r.b)}</td><td>${esc(r.r)}</td><td>${dl}</td><td>${lt}</td><td>${esc(r.nt)}</td><td>${/^https?:\/\//i.test(r.l||'')?`<div><a class="lk" href="${esc(r.l)}" target="_blank" rel="noopener noreferrer">🔗 فتح رابط الملف</a></div>`:''}${(r.pf||'').startsWith('data:image/')||/^\/_blob\//.test(r.pf||'')?`<div><a class="lk" href="#" data-img="${esc(r.id)}">🖼️ عرض صورة المقايسة</a></div>`:''}${fl?`<div class="mu">${esc(fl)}</div>`:''}</td><td><button class="x ed" data-act="ed" data-id="${esc(r.id)}">تعديل</button> <button class="x" data-act="del" data-id="${esc(r.id)}">حذف</button></td></tr>`}).join('')||'<tr><td colspan="10" class="mu">لا توجد نتائج</td></tr>';
+return`<tr class="${r.late?'late':''}"><td>${esc(r.n)}</td><td>${esc(r.c)}</td><td>${esc(r.p)}</td><td>${esc(r.b)}</td><td>${esc(r.r)}</td><td>${dl}</td><td>${lt}</td><td>${esc(r.nt)}</td><td>${/^https?:\/\//i.test(r.l||'')?`<div><a class="lk" href="${esc(r.l)}" target="_blank" rel="noopener noreferrer">🔗 فتح رابط الملف</a></div>`:''}${(r.pf||'').startsWith('data:image/')||/^\/_blob\//.test(r.pf||'')?`<div><a class="lk" href="#" data-img="${esc(r.id)}">🖼️ عرض صورة المقايسة</a></div>`:''}${fl?`<div class="mu">${esc(fl)}</div>`:''}</td><td>${can('edit')?`<button class="x ed" data-act="ed" data-id="${esc(r.id)}">تعديل</button>`:''} ${can('del')?`<button class="x" data-act="del" data-id="${esc(r.id)}">حذف</button>`:''}</td></tr>`}).join('')||'<tr><td colspan="10" class="mu">لا توجد نتائج</td></tr>';
 renderPg(pc,n)}
 function renderPg(pc,n){const s=new Set([0,1,pc-2,pc-1,page-2,page-1,page,page+1,page+2].filter(i=>i>=0&&i<pc)),a=[...s].sort((x,y)=>x-y);let h=`<button class="pn" data-p="${page-1}"${page?'':' disabled'}>السابق</button>`;a.forEach((p,i)=>{if(i&&p-a[i-1]>1)h+='<span class="mu">…</span>';h+=`<button class="pn${p===page?' cur':''}" data-p="${p}">${(p+1).toLocaleString('ar-EG')}</button>`});h+=`<button class="pn" data-p="${page+1}"${page<pc-1?'':' disabled'}>التالي</button><span class="mu" style="margin-inline-start:8px">اذهب إلى</span><input class="gp" type="number" min="1" max="${pc}" placeholder="${pc}"><button class="pn gb">اذهب</button>`;document.querySelectorAll('.pg').forEach(e=>{const keep=e.querySelector('.gp'),v=keep?keep.value:'';e.innerHTML=h;if(v)e.querySelector('.gp').value=v})}
 function goTo(p){page=p;draw();$('tb').closest('.card').scrollIntoView()}
@@ -405,7 +449,7 @@ document.querySelector('.fr').addEventListener('input',()=>{clearTimeout(tm);tm=
 $('cf').onclick=()=>{document.querySelectorAll('.fr input').forEach(i=>i.value='');apply()};
 function showHint(){const r=ts($('fr').value),d=ts($('fd').value),el=$('fh');if(isNaN(r)){el.textContent='';el.className='hint';return}if(isNaN(d)){el.textContent='المدة هتتحسب أول ما تدخل تاريخ التسليم';el.className='hint';return}const n=Math.round((d-r)/DAY),bad=n>GRACE;el.className='hint '+(bad?'bad':'good');el.textContent=bad?`⚠️ المدة ${n} يوم – تجاوزت ${GRACE} أيام وهتظهر باللون الأحمر`:`✓ المدة ${n} يوم – ضمن المسموح`}
 ['fr','fd'].forEach(i=>$(i).addEventListener('change',showHint));
-$('addb').onclick=()=>{editing=null;setMode();['fc','fp','fb','fn','fd'].forEach(i=>$(i).value='');$('fb').value='ك ';$('ff').value='';pend=null;$('fcur').textContent='اختر صورة (سكرين شوت أو غيره) أو الصقها بـ Ctrl+V';$('fm').hidden=false;$('fr').value=new Date(today).toISOString().slice(0,10);showHint();$('fm').scrollIntoView();$('fc').focus()};
+$('addb').onclick=()=>{if(!can('add'))return;editing=null;setMode();['fc','fp','fb','fn','fd'].forEach(i=>$(i).value='');$('fb').value='ك ';$('ff').value='';pend=null;$('fcur').textContent='اختر صورة (سكرين شوت أو غيره) أو الصقها بـ Ctrl+V';$('fm').hidden=false;$('fr').value=new Date(today).toISOString().slice(0,10);showHint();$('fm').scrollIntoView();$('fc').focus()};
 let editing=null;
 function setMode(){document.querySelector('#fm .fh').textContent=editing?'تعديل المقايسة':'إضافة مقايسة جديدة';$('sv').textContent=editing?'💾 حفظ التعديلات':'💾 حفظ المقايسة'}
 function openEdit(r){editing=r;setMode();$('fc').value=r.c||'';$('fp').value=r.p||'';$('fb').value=r.b||'';$('fr').value=r.r||'';$('fd').value=r.d||'';$('fn').value=r.nt||'';$('ff').value='';pend=null;$('fcur').textContent=r.pf?'يوجد صورة مرفوعة – اختر صورة جديدة لاستبدالها':'';$('fm').hidden=false;showHint();$('fm').scrollIntoView();$('fc').focus()}
@@ -424,7 +468,7 @@ if(editing){const e0=editing;if(e0.src==='a'){x.id=e0.id;x.n=e0.n}else{x.id='o'+
 await put(x);
 ['fc','fp','fb','fn','fd'].forEach(i=>$(i).value='');$('fb').value='ك ';$('ff').value='';$('fm').hidden=true;editing=null;setMode()};
 $('tb').onclick=async e=>{const t=e.target,id=t.dataset&&t.dataset.id;if(!id)return;const r=rows.find(x=>x.id===id);if(!r)return;
-if(t.dataset.act==='ed')return openEdit(r);
+if(t.dataset.act==='ed')return can('edit')?openEdit(r):undefined;if(!can('del'))return;
 if(!await ask('حذف هذه المقايسة؟'))return;
 if(r.src==='a')await rm(id);else await put({id:'o'+id.slice(1),ov:1,bi:+id.slice(1),del:true})};
 function saveAll(){lsSet();$('sync').textContent='تم حفظ البيانات على هذا الجهاز ✓';}
@@ -474,7 +518,7 @@ const XL=(()=>{
  function save(blob,name){const u=URL.createObjectURL(blob),a=document.createElement('a');a.href=u;a.download=name;document.body.appendChild(a);a.click();a.remove();setTimeout(()=>URL.revokeObjectURL(u),4000)}
  return{book,save}})();
 window.XL=XL;
-$('exportExcel').onclick=async()=>{
+$('exportExcel').onclick=async()=>{if(!can('export'))return;
  const list=view;
  if(!list.length){alert('مفيش مقايسات في الجدول عشان تتحمّل');return}
  const btn=$('exportExcel'),t0=btn.textContent;btn.disabled=true;btn.textContent='⏳ جارٍ التجهيز…';
