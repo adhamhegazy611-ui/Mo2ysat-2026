@@ -1,0 +1,3 @@
+{
+  "functions": { "api/base.js": { "includeFiles": "api/_data/**" } }
+}
