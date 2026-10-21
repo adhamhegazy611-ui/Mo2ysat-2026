@@ -1,5 +1,5 @@
 <!DOCTYPE html>
-<html lang="ar" dir="rtl"><head><meta charset="utf-8">
+<html lang="ar" dir="rtl" data-theme="light"><head><meta charset="utf-8">
 <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
 <title>متابعة المقايسات</title>
 <link rel="preconnect" href="https://fonts.googleapis.com"><link rel="preconnect" href="https://fonts.gstatic.com" crossorigin><link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Cairo:wght@400;600;700&display=swap">
@@ -96,6 +96,114 @@ body{background:#4b5058!important}
 .dsc{margin-bottom:12px}.dsc .sh{display:flex;justify-content:space-between;align-items:center;gap:8px;flex-wrap:wrap;margin-bottom:10px}.dsc h3{margin:0}
 .dbl{display:flex;gap:4px;flex-wrap:wrap;margin-top:4px}.dbl i{font-style:normal;font-size:12px;border-radius:6px;padding:1px 7px;background:#dbeafe;color:#1e3a8a}
 .dpr .nm{display:flex;flex-direction:column;gap:2px}
+
+/* ================= الثيم الموحّد: كحلي + كهرماني (من ألوان صورة الطريق) ================= */
+:root{--nv:#1e3a8a;--nv2:#1e40af;--am:#f59e0b;--am2:#d97706;--pg1:#0b1222;--pg2:#1e293b;--ac:#1e40af;--acx:#fff;--bg:#f1f5f9}
+body{background:linear-gradient(180deg,var(--pg1) 0%,var(--pg2) 100%) fixed!important;min-height:100vh}
+.w{padding:18px 14px 30px}
+
+/* شاشة الدخول */
+#lgn{background:linear-gradient(180deg,rgba(2,6,23,.35),rgba(2,6,23,.75)),url(login-bg.jpg) center/cover no-repeat!important}
+#lgn .b{background:rgba(15,23,42,.8)!important;-webkit-backdrop-filter:blur(14px);backdrop-filter:blur(14px);border:1px solid rgba(255,255,255,.12)!important;border-top:3px solid var(--am)!important;color:#f8fafc;box-shadow:0 24px 60px rgba(0,0,0,.55)!important;max-width:380px;padding:28px!important}
+#lgn h1{color:#fff}#lgn p{color:#cbd5e1!important}
+#lgn input{background:rgba(255,255,255,.07)!important;border:1px solid rgba(255,255,255,.18)!important;color:#fff!important;border-radius:10px;height:48px}
+#lgn input::placeholder{color:#94a3b8}
+#lgn input:focus{outline:2px solid var(--am);outline-offset:0;border-color:var(--am)!important}
+#lgn input:-webkit-autofill{-webkit-text-fill-color:#fff;box-shadow:0 0 0 100px #1e293b inset;caret-color:#fff}
+#lgn button.p{background:var(--am)!important;border-color:var(--am)!important;color:#1c1100!important;border-radius:10px;height:48px;font-weight:700}
+#lgn button.p:hover{background:#fbbf24!important}
+#lgn .sw a{color:#fbbf24!important}
+#lerr,#smsg{color:#fca5a5!important}#smsg.ok{color:#86efac!important}
+
+/* الهيدر */
+.hd{background:linear-gradient(135deg,#0f172a 0%,#1e3a8a 100%)!important;border:1px solid rgba(255,255,255,.08);border-bottom:3px solid var(--am);border-radius:16px;box-shadow:0 12px 30px rgba(0,0,0,.35)!important;display:flex;flex-wrap:wrap;align-items:center;justify-content:space-between;gap:14px}
+.hd p{color:#cbd5e1;opacity:1}
+.hrow{display:flex;gap:8px;flex-wrap:wrap}
+.hd button{height:40px;padding:0 14px;border-radius:10px;background:rgba(255,255,255,.08);border:1px solid rgba(255,255,255,.22);color:#fff;font-size:13px;font-weight:600;display:inline-flex;align-items:center;justify-content:center;gap:6px;min-width:150px}
+.hd button:hover{background:rgba(255,255,255,.16);border-color:var(--am)}
+
+/* الكروت */
+.card{border:0!important;border-radius:16px;box-shadow:0 10px 28px rgba(0,0,0,.22)}
+.card.stats{box-shadow:none}
+.st{background:#fff!important;border:0!important;border-top:4px solid var(--nv2)!important;border-radius:14px!important;box-shadow:0 8px 22px rgba(0,0,0,.22)!important;padding:14px 18px!important}
+.st:nth-child(2){border-top-color:#dc2626!important}.st:nth-child(3){border-top-color:var(--am)!important}
+.st b{font-size:26px;color:#0f172a}.st span{color:#475569!important;font-size:14px!important}
+.st[data-f].on{outline:3px solid var(--am)!important;outline-offset:2px}
+
+/* البحث والأزرار — كلهم نفس المقاس */
+#q{height:50px;border-radius:12px;border:1px solid #cbd5e1;background:#f8fafc}
+#q:focus{outline:2px solid var(--nv2);border-color:var(--nv2);background:#fff}
+.bar{gap:10px;margin-top:12px}
+.bar select,.bar button{height:44px;min-width:140px;padding:0 16px;border-radius:10px;font-size:14px;font-weight:600;border:1px solid #cbd5e1;background:#fff;color:#0f172a;display:inline-flex;align-items:center;justify-content:center;gap:6px;transition:background .15s,border-color .15s,color .15s}
+.bar select{padding:0 12px;cursor:pointer}
+.bar button:hover,.bar select:hover{border-color:var(--nv2);color:var(--nv2)}
+.bar button:disabled{opacity:.6;cursor:default}
+#kb,#pb{background:var(--nv2)!important;border-color:var(--nv2)!important;color:#fff!important;font-size:14px!important;min-width:140px!important;font-weight:700!important}
+#kb:hover,#pb:hover{background:var(--nv)!important;color:#fff!important}
+#addb{background:var(--am)!important;border-color:var(--am)!important;color:#1c1100!important;font-weight:700}
+#addb:hover{background:#fbbf24!important;color:#1c1100!important}
+#exportExcel{border-color:#15803d;color:#15803d}#exportExcel:hover{background:#15803d;color:#fff;border-color:#15803d}
+#sync{margin-inline-start:auto}
+@media(max-width:640px){.bar select,.bar button{flex:1 1 calc(50% - 10px);min-width:0!important}#sync{flex-basis:100%;text-align:center}}
+
+/* الجدول */
+.tw{border:1px solid #cbd5e1!important;background:#fff!important;border-radius:12px}
+table{background:#fff!important}
+th{background:var(--nv)!important;color:#fff!important;border-color:#1e3a8a!important}
+.fr th{background:#e0e7ff!important;border-color:#c7d2fe!important}
+.fr input{border-color:#c7d2fe!important}.fr input:focus{outline-color:var(--nv2)}
+td{border-color:#e2e8f0!important}
+tbody tr:not(.late):hover td{background:#f8fafc!important}
+.tw a.lk{color:var(--nv2)}
+.fr #cf{height:32px;border-radius:8px}
+
+/* الترقيم */
+.pn{height:38px;min-width:42px;border-radius:9px;font-weight:600}.pn.cur{background:var(--nv2)!important;border-color:var(--nv2)!important;color:#fff!important}
+.gp{height:38px;border-radius:9px}
+
+/* فورم الإضافة */
+#fm{background:#fff!important;border:0!important;border-top:4px solid var(--am)!important;--ac:#1e40af}
+#fm .fh{color:var(--nv)!important}
+#fm button.p{background:var(--nv2)!important;border-color:var(--nv2)!important;color:#fff!important}
+#fm button#cn{border-color:#cbd5e1!important;color:#0f172a!important}
+
+/* لوحة الكتايب والمشاريع */
+#dsh{background:linear-gradient(180deg,var(--pg1) 0%,var(--pg2) 100%)!important;padding:0 14px 24px}
+#dsh .dhd{position:sticky;top:0;background:rgba(11,18,34,.94);-webkit-backdrop-filter:blur(8px);backdrop-filter:blur(8px);padding:14px 0 12px;margin-bottom:14px;border-bottom:1px solid rgba(255,255,255,.08)}
+#dsh .dtop h2{color:#fff;font-size:20px}
+#dsh .dtop button,#dsh .dsr button,#dsh .dtabs button,#dsh [data-a=more],#dsh [data-bt]{height:42px;min-width:130px;padding:0 16px;border-radius:10px;font-size:14px;font-weight:600;display:inline-flex;align-items:center;justify-content:center;gap:6px;background:#fff;color:#0f172a;border:1px solid #cbd5e1}
+#dsh .dtop button{background:rgba(255,255,255,.08);color:#fff;border-color:rgba(255,255,255,.22)}
+#dsh .dtop button:hover{background:rgba(255,255,255,.16);border-color:var(--am)}
+#dsh .dmode button.on{background:var(--am);border-color:var(--am);color:#1c1100;font-weight:700}
+#dsh .dsr input{height:46px;border-radius:12px;border:1px solid transparent;background:#fff;font-size:15px}
+#dsh .dsr input:focus{outline:2px solid var(--am)}
+#dsh .dsr button{background:rgba(255,255,255,.08);color:#fff;border-color:rgba(255,255,255,.22);min-width:90px}
+#dsh .dsr .mu{color:#fbbf24!important;font-weight:600}
+#dsh .dtabs{gap:8px;margin-bottom:14px}
+#dsh .dtabs button:hover{border-color:var(--nv2);color:var(--nv2)}
+#dsh .dtabs button.on{background:var(--nv2);border-color:var(--nv2);color:#fff}
+#dsh [data-bt]{height:38px;min-width:0;font-size:13px}
+#dsh [data-bt]:hover,#dsh [data-a=more]:hover{border-color:var(--nv2);color:var(--nv2)}
+.dg{gap:14px}
+.dcd{background:#fff;border:0;border-top:4px solid var(--nv2);border-radius:14px;box-shadow:0 8px 20px rgba(0,0,0,.25);padding:16px;transition:transform .15s,border-color .15s}
+.dcd:hover{transform:translateY(-3px);border-top-color:var(--am)}
+.dcd b{color:#0f172a}
+.dpn{background:#fff;border:0;border-radius:14px;box-shadow:0 8px 22px rgba(0,0,0,.22)}
+.dpn h3{color:var(--nv)}
+.dst{gap:10px}.dst div{background:#f8fafc;border:1px solid #e2e8f0;border-radius:12px;padding:10px 16px;min-width:130px;flex:1}
+.dst div b{color:#0f172a}.dst div[data-a]:hover{border-color:var(--nv2)}
+.dst div.on{outline:2px solid var(--nv2);border-color:var(--nv2)}
+.dst div.r b{color:#dc2626}.dst div.o b{color:var(--am2)}
+.dpr{background:#fff;border:0;border-inline-start:4px solid var(--nv2);border-radius:12px;box-shadow:0 4px 14px rgba(0,0,0,.2);padding:12px 16px;margin-bottom:10px}
+.dpr:hover{border-inline-start-color:var(--am);outline:2px solid var(--am)}
+.dpr b{color:#0f172a}
+.dtg i{background:#f1f5f9;border-color:#e2e8f0;color:#334155}
+.dbl i{background:#e0e7ff;color:var(--nv);font-weight:600}
+.dch{background:var(--am);color:#1c1100;border:0;font-weight:700;padding:6px 14px}
+#dsh .dpe{color:#64748b}
+.dsc .sh{border-bottom:1px solid #e2e8f0;padding-bottom:10px}
+#dsh [hidden],.bar [hidden],.hd [hidden]{display:none!important}
+@media(max-width:640px){.hrow{width:100%;display:grid;grid-template-columns:1fr 1fr}.hd button{min-width:0;width:100%;white-space:nowrap;font-size:12px;padding:0 8px}.hrow #lo{grid-column:1/-1}#dsh .dtop{flex-wrap:wrap}#dsh .dtop>div{width:100%}#dsh .dtop>div:last-child{display:grid!important;grid-template-columns:1fr 1fr 1fr}.dmode{display:contents}#dsh .dtop button{min-width:0;padding:0 8px}#dsh .dtabs button{flex:1 1 calc(50% - 8px);min-width:0;font-size:13px;padding:0 8px}.dst div{min-width:calc(50% - 10px)}#dsh .dsr button{min-width:70px}}
 </style>
 </head><body><div id="lgn"><div class="b"><h1>📋 متابعة المقايسات</h1><p>سجّل الدخول للمتابعة</p>
 <input id="lu" placeholder="اسم المستخدم" autocomplete="username" autocapitalize="none"><input id="lp" type="password" placeholder="كلمة المرور" autocomplete="current-password">
@@ -104,11 +212,11 @@ body{background:#4b5058!important}
 <input id="su" placeholder="اسم المستخدم (حروف إنجليزي وأرقام)" autocomplete="username" autocapitalize="none"><input id="sp" type="password" placeholder="كلمة المرور (٨ حروف على الأقل)" autocomplete="new-password"><input id="sp2" type="password" placeholder="أعد كتابة كلمة المرور" autocomplete="new-password">
 <div id="smsg"></div><button class="p" id="sgb">إرسال طلب إنشاء الحساب</button><div class="sw"><a id="tolg">رجوع لتسجيل الدخول</a></div></div></div>
 <div class="w">
-<header class="hd"><h1>📋 متابعة المقايسات</h1><p>ابحث عن أي مقايسة فورًا، وتابع المتأخر منها باللون الأحمر</p></header>
+<header class="hd"><div class="ht"><h1>📋 متابعة المقايسات</h1><p>ابحث عن أي مقايسة فورًا، وتابع المتأخر منها باللون الأحمر</p></div></header>
 <div class="card stats"><div class="st" data-f="all" role="button" tabindex="0" title="اعرض كل المقايسات"><b id="s1">0</b><span>إجمالي المقايسات</span></div><div class="st" data-f="late" role="button" tabindex="0" title="اعرض المتجاوزة بس"><b id="s2" style="color:var(--redtx)">0</b><span>تجاوزت ٥ أيام</span></div><div class="st" data-f="open" role="button" tabindex="0" title="اعرض اللي لسه ما اتسلمتش"><b id="s3">0</b><span>لم تُسلَّم بعد</span></div></div>
 <div class="card"><input id="q" placeholder="ابحث بالشركة أو المشروع أو ك أو الملاحظات…" autocomplete="off">
 <div class="bar"><select id="flt"><option value="all">الكل</option><option value="late">المتجاوزة ٥ أيام فقط</option><option value="open">غير المسلَّمة فقط</option><option value="added">المضافة حديثًا</option></select>
-<select id="yr"><option value="">كل السنوات</option></select><button id="kb" title="الكتايب">ك</button><button id="pb" title="المشاريع وكتايبها">🏗️ المشاريع</button><button class="p" id="addb">+ إضافة مقايسة</button><button id="saveall">💾 حفظ البيانات</button><button id="exportExcel">⬇️ تحميل Excel</button><span class="mu" id="sync"></span></div></div>
+<select id="yr"><option value="">كل السنوات</option></select><button id="kb" title="الكتايب">ك الكتايب</button><button id="pb" title="المشاريع وكتايبها">🏗️ المشاريع</button><button class="p" id="addb">+ إضافة مقايسة</button><button id="saveall">💾 حفظ البيانات</button><button id="exportExcel">⬇️ تحميل Excel</button><span class="mu" id="sync"></span></div></div>
 <div class="card fm" id="fm" hidden><h2 class="fh">إضافة مقايسة جديدة</h2><div class="fs">الحقول المعلّمة بـ * مطلوبة. لو المدة من تاريخ الاستلام لتاريخ التسليم زادت عن ٥ أيام، الصف هيظهر باللون الأحمر.</div><div class="f">
 <label>الشركة <span class="req">*</span><input id="fc" placeholder="اسم الشركة"></label><label>ك<input id="fb" placeholder="ك" value="ك "></label>
 <label class="w2">المشروع <span class="req">*</span><input id="fp" placeholder="اسم المشروع"></label>
@@ -142,7 +250,7 @@ async function enter(session){
  if(!m){await sb.auth.signOut();$l('lerr').textContent='حسابك لسه مستني موافقة المسؤول';return}
  document.body.classList.add('in');$l('lgn').remove();
  const hd=document.querySelector('.hd');
- if(hd){const b=document.createElement('button');b.textContent='تسجيل الخروج ('+m.username+')';b.style.cssText='margin-top:10px';
+ if(hd){const b=document.createElement('button');b.id='lo';b.textContent='🚪 خروج ('+m.username+')';
   b.onclick=async()=>{await sb.auth.signOut();location.reload()};hd.appendChild(b)}
  if(typeof setupAccountTools==='function')setupAccountTools(m);
  resolveDb(mkShim());
@@ -209,9 +317,10 @@ document.addEventListener('DOMContentLoaded',()=>{
 });
 function setupAccountTools(m){
  const hd=document.querySelector('.hd');if(!hd)return;
- const row=document.createElement('div');row.style.cssText='margin-top:10px;display:flex;gap:8px;flex-wrap:wrap';
+ const row=document.createElement('div');row.className='hrow';
  const pw=document.createElement('button');pw.textContent='🔑 تغيير كلمة المرور';pw.onclick=openPwModal;row.appendChild(pw);
  if(m&&m.role==='admin'){const rq=document.createElement('button');rq.id='rqb';rq.innerHTML='👥 طلبات إنشاء الحساب';rq.onclick=openReqModal;row.appendChild(rq);refreshReqCount()}
+ const lo=document.getElementById('lo');if(lo)row.appendChild(lo);
  hd.appendChild(row)}
 async function refreshReqCount(){
  const b=document.getElementById('rqb');if(!b)return;
@@ -320,14 +429,62 @@ if(!await ask('حذف هذه المقايسة؟'))return;
 if(r.src==='a')await rm(id);else await put({id:'o'+id.slice(1),ov:1,bi:+id.slice(1),del:true})};
 function saveAll(){lsSet();$('sync').textContent='تم حفظ البيانات على هذا الجهاز ✓';}
 $('saveall').onclick=saveAll;
-$('exportExcel').onclick=()=>{
- const data=[['م','الشركة','المشروع','ك','تاريخ الاستلام','تاريخ التسليم','المدة بالأيام','ملاحظات','اسم/رابط الملف']];
- const escCsv=v=>{v=String(v??'');return '"'+v.replace(/"/g,'""')+'"';};
- rows.forEach(r=>data.push([r.n,r.c,r.p,r.b,r.r,r.d,r.days===null?'':r.days,r.nt,r.l||r.f||(r.pf?'صورة مرفوعة':'' )]));
- const csv='\\ufeff'+data.map(row=>row.map(escCsv).join(',')).join('\\r\\n');
- const blob=new Blob([csv],{type:'text/csv;charset=utf-8;'});
- const url=URL.createObjectURL(blob),a=document.createElement('a');a.href=url;a.download='متابعة_المقايسات.csv';document.body.appendChild(a);a.click();a.remove();URL.revokeObjectURL(url);
-};
+/* مولّد ملفات Excel (.xlsx) مدمج — من غير أي مكتبة خارجية */
+const XL=(()=>{
+ const enc=new TextEncoder(),CT=new Uint32Array(256);for(let n=0;n<256;n++){let c=n;for(let k=0;k<8;k++)c=c&1?0xEDB88320^(c>>>1):c>>>1;CT[n]=c>>>0}
+ const crc=b=>{let c=0xFFFFFFFF;for(let i=0;i<b.length;i++)c=CT[(c^b[i])&255]^(c>>>8);return(c^0xFFFFFFFF)>>>0};
+ async function defl(d){try{if(typeof CompressionStream==='undefined')return null;const cs=new CompressionStream('deflate-raw');const st=new Blob([d]).stream().pipeThrough(cs);return new Uint8Array(await new Response(st).arrayBuffer())}catch(e){return null}}
+ async function zip(files){const parts=[],cen=[];let off=0;
+  for(const[name,txt]of files){const nm=enc.encode(name),d=enc.encode(txt),c=crc(d),z=await defl(d),m=z?8:0,body=z||d,h=new DataView(new ArrayBuffer(30));
+   h.setUint32(0,0x04034b50,true);h.setUint16(4,20,true);h.setUint16(6,0x0800,true);h.setUint16(8,m,true);h.setUint16(10,0,true);h.setUint16(12,0x21,true);
+   h.setUint32(14,c,true);h.setUint32(18,body.length,true);h.setUint32(22,d.length,true);h.setUint16(26,nm.length,true);h.setUint16(28,0,true);
+   const ce=new DataView(new ArrayBuffer(46));ce.setUint32(0,0x02014b50,true);ce.setUint16(4,20,true);ce.setUint16(6,20,true);ce.setUint16(8,0x0800,true);ce.setUint16(10,m,true);ce.setUint16(12,0,true);ce.setUint16(14,0x21,true);
+   ce.setUint32(16,c,true);ce.setUint32(20,body.length,true);ce.setUint32(24,d.length,true);ce.setUint16(28,nm.length,true);ce.setUint32(42,off,true);
+   parts.push(new Uint8Array(h.buffer),nm,body);cen.push(new Uint8Array(ce.buffer),nm);off+=30+nm.length+body.length}
+  const cl=cen.reduce((a,b)=>a+b.length,0),e=new DataView(new ArrayBuffer(22));
+  e.setUint32(0,0x06054b50,true);e.setUint16(8,files.length,true);e.setUint16(10,files.length,true);e.setUint32(12,cl,true);e.setUint32(16,off,true);
+  return new Blob([...parts,...cen,new Uint8Array(e.buffer)],{type:'application/vnd.openxmlformats-officedocument.spreadsheetml.sheet'})}
+ const x=v=>String(v).replace(/[\u0000-\u0008\u000B\u000C\u000E-\u001F]/g,'').replace(/[&<>"]/g,c=>({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;'}[c]));
+ const col=i=>{let s='';i++;while(i){const m=(i-1)%26;s=String.fromCharCode(65+m)+s;i=(i-m-1)/26}return s};
+ /* sheets: [{name, widths:[..], rows:[[..]], rowStyle:(rowIndex)=>'late'|null}] ; أول صف = عناوين */
+ async function book(sheets){
+  const ws=sheets.map(sh=>{const last=col(sh.rows[0].length-1)+sh.rows.length;
+   const body=sh.rows.map((r,ri)=>{const st=ri===0?1:(sh.rowStyle&&sh.rowStyle(ri)==='late'?3:2);
+    return'<row r="'+(ri+1)+'">'+r.map((v,ci)=>{const ref=col(ci)+(ri+1);if(v===''||v==null)return'<c r="'+ref+'" s="'+st+'"/>';
+     return typeof v==='number'&&isFinite(v)?'<c r="'+ref+'" s="'+st+'"><v>'+v+'</v></c>':'<c r="'+ref+'" s="'+st+'" t="inlineStr"><is><t xml:space="preserve">'+x(v)+'</t></is></c>'}).join('')+'</row>'}).join('');
+   return'<?xml version="1.0" encoding="UTF-8" standalone="yes"?><worksheet xmlns="http://schemas.openxmlformats.org/spreadsheetml/2006/main" xmlns:r="http://schemas.openxmlformats.org/officeDocument/2006/relationships">'+
+    '<sheetViews><sheetView rightToLeft="1" workbookViewId="0"><pane ySplit="1" topLeftCell="A2" activePane="bottomLeft" state="frozen"/></sheetView></sheetViews><sheetFormatPr defaultRowHeight="18"/>'+
+    '<cols>'+sh.widths.map((w,i)=>'<col min="'+(i+1)+'" max="'+(i+1)+'" width="'+w+'" customWidth="1"/>').join('')+'</cols>'+
+    '<sheetData>'+body+'</sheetData><autoFilter ref="A1:'+last+'"/></worksheet>'});
+  const files=[['[Content_Types].xml','<?xml version="1.0" encoding="UTF-8" standalone="yes"?><Types xmlns="http://schemas.openxmlformats.org/package/2006/content-types"><Default Extension="rels" ContentType="application/vnd.openxmlformats-package.relationships+xml"/><Default Extension="xml" ContentType="application/xml"/><Override PartName="/xl/workbook.xml" ContentType="application/vnd.openxmlformats-officedocument.spreadsheetml.sheet.main+xml"/><Override PartName="/xl/styles.xml" ContentType="application/vnd.openxmlformats-officedocument.spreadsheetml.styles+xml"/>'+ws.map((_,i)=>'<Override PartName="/xl/worksheets/sheet'+(i+1)+'.xml" ContentType="application/vnd.openxmlformats-officedocument.spreadsheetml.worksheet+xml"/>').join('')+'</Types>'],
+   ['_rels/.rels','<?xml version="1.0" encoding="UTF-8" standalone="yes"?><Relationships xmlns="http://schemas.openxmlformats.org/package/2006/relationships"><Relationship Id="rId1" Type="http://schemas.openxmlformats.org/officeDocument/2006/relationships/officeDocument" Target="xl/workbook.xml"/></Relationships>'],
+   ['xl/workbook.xml','<?xml version="1.0" encoding="UTF-8" standalone="yes"?><workbook xmlns="http://schemas.openxmlformats.org/spreadsheetml/2006/main" xmlns:r="http://schemas.openxmlformats.org/officeDocument/2006/relationships"><bookViews><workbookView/></bookViews><sheets>'+sheets.map((sh,i)=>'<sheet name="'+x(sh.name)+'" sheetId="'+(i+1)+'" r:id="rId'+(i+1)+'"/>').join('')+'</sheets><definedNames>'+sheets.map((sh,i)=>'<definedName name="_xlnm._FilterDatabase" localSheetId="'+i+'" hidden="1">\''+x(sh.name)+'\'!$A$1:$'+col(sh.rows[0].length-1)+'$'+sh.rows.length+'</definedName>').join('')+'</definedNames></workbook>'],
+   ['xl/_rels/workbook.xml.rels','<?xml version="1.0" encoding="UTF-8" standalone="yes"?><Relationships xmlns="http://schemas.openxmlformats.org/package/2006/relationships">'+sheets.map((_,i)=>'<Relationship Id="rId'+(i+1)+'" Type="http://schemas.openxmlformats.org/officeDocument/2006/relationships/worksheet" Target="worksheets/sheet'+(i+1)+'.xml"/>').join('')+'<Relationship Id="rId'+(sheets.length+1)+'" Type="http://schemas.openxmlformats.org/officeDocument/2006/relationships/styles" Target="styles.xml"/></Relationships>'],
+   ['xl/styles.xml','<?xml version="1.0" encoding="UTF-8" standalone="yes"?><styleSheet xmlns="http://schemas.openxmlformats.org/spreadsheetml/2006/main">'+
+    '<fonts count="3"><font><sz val="11"/><name val="Arial"/></font><font><b/><sz val="11"/><color rgb="FFFFFFFF"/><name val="Arial"/></font><font><sz val="11"/><color rgb="FFB91C1C"/><name val="Arial"/></font></fonts>'+
+    '<fills count="4"><fill><patternFill patternType="none"/></fill><fill><patternFill patternType="gray125"/></fill><fill><patternFill patternType="solid"><fgColor rgb="FF1E3A8A"/><bgColor indexed="64"/></patternFill></fill><fill><patternFill patternType="solid"><fgColor rgb="FFFEE2E2"/><bgColor indexed="64"/></patternFill></fill></fills>'+
+    '<borders count="2"><border><left/><right/><top/><bottom/><diagonal/></border><border><left style="thin"><color rgb="FFCBD5E1"/></left><right style="thin"><color rgb="FFCBD5E1"/></right><top style="thin"><color rgb="FFCBD5E1"/></top><bottom style="thin"><color rgb="FFCBD5E1"/></bottom><diagonal/></border></borders>'+
+    '<cellStyleXfs count="1"><xf numFmtId="0" fontId="0" fillId="0" borderId="0"/></cellStyleXfs><cellXfs count="4"><xf numFmtId="0" fontId="0" fillId="0" borderId="0" xfId="0"/>'+
+    '<xf numFmtId="0" fontId="1" fillId="2" borderId="1" xfId="0" applyFont="1" applyFill="1" applyBorder="1" applyAlignment="1"><alignment horizontal="center" vertical="center" wrapText="1"/></xf>'+
+    '<xf numFmtId="0" fontId="0" fillId="0" borderId="1" xfId="0" applyBorder="1" applyAlignment="1"><alignment horizontal="center" vertical="center" wrapText="1"/></xf>'+
+    '<xf numFmtId="0" fontId="2" fillId="3" borderId="1" xfId="0" applyFont="1" applyFill="1" applyBorder="1" applyAlignment="1"><alignment horizontal="center" vertical="center" wrapText="1"/></xf>'+
+    '</cellXfs><cellStyles count="1"><cellStyle name="Normal" xfId="0" builtinId="0"/></cellStyles></styleSheet>']];
+  ws.forEach((w,i)=>files.push(['xl/worksheets/sheet'+(i+1)+'.xml',w]));
+  return zip(files)}
+ function save(blob,name){const u=URL.createObjectURL(blob),a=document.createElement('a');a.href=u;a.download=name;document.body.appendChild(a);a.click();a.remove();setTimeout(()=>URL.revokeObjectURL(u),4000)}
+ return{book,save}})();
+window.XL=XL;
+$('exportExcel').onclick=async()=>{
+ const list=view;
+ if(!list.length){alert('مفيش مقايسات في الجدول عشان تتحمّل');return}
+ const btn=$('exportExcel'),t0=btn.textContent;btn.disabled=true;btn.textContent='⏳ جارٍ التجهيز…';
+ try{
+  const data=[['م','الشركة','المشروع','ك','تاريخ الاستلام','تاريخ التسليم','المدة بالأيام','الحالة','ملاحظات','الملف']];
+  list.forEach(r=>data.push([+r.n||r.n||'',r.c||'',r.p||'',r.b||'',r.r||'',r.d||'',r.days===null?'':r.days,r.late?'متأخرة (تجاوزت '+GRACE+' أيام)':r.open?'لم تُسلَّم بعد':'مسلَّمة',r.nt||'',r.l||(r.f?String(r.f).split('\\').pop():'')||(r.pf?'صورة مرفوعة على الموقع':'')]));
+  const blob=await XL.book([{name:'المقايسات',widths:[8,34,44,12,15,15,12,24,40,34],rows:data,rowStyle:i=>list[i-1].late?'late':null}]);
+  XL.save(blob,'Mo2ysaat_'+new Date().toISOString().slice(0,10)+'.xlsx')}
+ catch(e){alert('تعذّر تجهيز ملف الإكسيل، جرّب تاني')}
+ btn.disabled=false;btn.textContent=t0};
 added=lsGet();build();$('sync').textContent='الحفظ على هذا الجهاز فقط';
 (async()=>{try{const c=window.claude&&await window.claude.use('db');if(!c)return;db=c;
 const loc=lsGet();if(loc.length){try{await Promise.all(loc.map(x=>c.collection('added').doc(x.id).set(x)));localStorage.removeItem('est_added')}catch(e){}}
