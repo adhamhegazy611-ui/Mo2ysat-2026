@@ -224,7 +224,7 @@ tbody tr:not(.late):hover td{background:#f8fafc!important}
 <div class="card stats"><div class="st" data-f="all" role="button" tabindex="0" title="اعرض كل المقايسات"><b id="s1">0</b><span>إجمالي المقايسات</span></div><div class="st" data-f="late" role="button" tabindex="0" title="اعرض المتجاوزة بس"><b id="s2" style="color:var(--redtx)">0</b><span>تجاوزت ٥ أيام</span></div><div class="st" data-f="open" role="button" tabindex="0" title="اعرض اللي لسه ما اتسلمتش"><b id="s3">0</b><span>لم تُسلَّم بعد</span></div></div>
 <div class="card"><input id="q" placeholder="ابحث بالشركة أو المشروع أو ك أو الملاحظات…" autocomplete="off">
 <div class="bar"><select id="flt"><option value="all">الكل</option><option value="late">المتجاوزة ٥ أيام فقط</option><option value="open">غير المسلَّمة فقط</option><option value="added">المضافة حديثًا</option></select>
-<select id="yr"><option value="">كل السنوات</option></select><button id="kb" title="الكتايب">ك الكتايب</button><button id="pb" title="المشاريع وكتايبها">🏗️ المشاريع</button><button class="p" id="addb">+ إضافة مقايسة</button><button id="saveall">💾 حفظ البيانات</button><button id="exportExcel">⬇️ تحميل Excel</button><span class="mu" id="sync"></span></div></div>
+<select id="yr"><option value="">كل السنوات</option></select><button id="kb" title="الكتايب">ك الكتايب</button><button id="pb" title="المشاريع وكتايبها">🏗️ المشاريع</button><button class="p" id="addb">+ إضافة مقايسة</button><button id="saveall">💾 حفظ البيانات</button><button id="exportExcel">⬇️ تحميل Excel</button><button id="rangeDel" hidden title="للمسؤول فقط">🗑️ مسح من ٢٠٢٢ إلى ٢٠٢٤</button><span class="mu" id="sync"></span></div></div>
 <div class="card fm" id="fm" hidden><h2 class="fh">إضافة مقايسة جديدة</h2><div class="fs">الحقول المعلّمة بـ * مطلوبة. لو المدة من تاريخ الاستلام لتاريخ التسليم زادت عن ٥ أيام، الصف هيظهر باللون الأحمر.</div><div class="f">
 <label>الشركة <span class="req">*</span><input id="fc" placeholder="اسم الشركة"></label><label>ك<input id="fb" placeholder="ك" value="ك "></label>
 <label class="w2">المشروع <span class="req">*</span><input id="fp" placeholder="اسم المشروع"></label>
@@ -273,7 +273,8 @@ function mkShim(){return{collection:()=>({
   const load=async()=>{let all=[],from=0;for(;;){const{data,error}=await sb.from(SB_TBL).select('id,doc').order('id').range(from,from+999);
    if(error){bad&&bad(error);return}all=all.concat(data);if(data.length<1000)break;from+=1000}
    ok({docs:all.map(d=>({id:d.id,data:()=>d.doc}))})};
-  load();sb.channel('est-sync').on('postgres_changes',{event:'*',schema:'public',table:SB_TBL},load).subscribe()}
+  let lt;const lazyLoad=()=>{clearTimeout(lt);lt=setTimeout(load,500)};
+  load();sb.channel('est-sync').on('postgres_changes',{event:'*',schema:'public',table:SB_TBL},lazyLoad).subscribe()}
 })}}
 const $l=id=>document.getElementById(id);
 async function enter(session,resumed){
@@ -286,6 +287,7 @@ async function enter(session,resumed){
  idleSetup();watchAccount();
  if(ssGet('permsChanged')){try{sessionStorage.removeItem('permsChanged')}catch(e){}setTimeout(()=>alert('المسؤول عدّل صلاحيات حسابك، واتطبّقت دلوقتي.'),800)}
  if(!can('add'))$l('addb').hidden=true;if(!can('export'))$l('exportExcel').hidden=true;
+ if(ME.role==='admin')$l('rangeDel').hidden=false;
  document.body.classList.add('in');$l('lgn').remove();
  const hd=document.querySelector('.hd');
  if(hd){const b=document.createElement('button');b.id='lo';b.textContent='🚪 خروج ('+m.username+')';
@@ -485,6 +487,30 @@ $('tb').onclick=async e=>{const t=e.target,id=t.dataset&&t.dataset.id;if(!id)ret
 if(t.dataset.act==='ed')return can('edit')?openEdit(r):undefined;if(!can('del'))return;
 if(!await ask('حذف هذه المقايسة؟'))return;
 if(r.src==='a')await rm(id);else await put({id:'o'+id.slice(1),ov:1,bi:+id.slice(1),del:true})};
+/* مسح جماعي (للمسؤول فقط): كل المقايسات اللي تاريخ استلامها بين RANGE_FROM و RANGE_TO */
+const RANGE_FROM='2022-01-01',RANGE_TO='2024-12-31';
+$('rangeDel').onclick=async()=>{
+ if(ME.role!=='admin')return;
+ const hit=rows.filter(r=>{const d=String(r.r||'').slice(0,10);return /^\d{4}-\d{2}-\d{2}$/.test(d)&&d>=RANGE_FROM&&d<=RANGE_TO});
+ if(!hit.length){alert('مفيش مقايسات تاريخ استلامها بين ٢٠٢٢ و ٢٠٢٤.');return}
+ const n=hit.length.toLocaleString('ar-EG');
+ if(!await ask('هيتم حذف '+n+' مقايسة تاريخ استلامها من ١-١-٢٠٢٢ إلى ٣١-١٢-٢٠٢٤. متأكد؟'))return;
+ if(!await ask('تأكيد أخير: حذف '+n+' مقايسة. حمّلت نسخة Excel احتياطية؟'))return;
+ const btn=$('rangeDel');btn.disabled=true;
+ const base=hit.filter(r=>r.src==='b'),mine=hit.filter(r=>r.src==='a');
+ let done=0;const tick=()=>{$('sync').textContent='جارٍ الحذف… '+done.toLocaleString('ar-EG')+' / '+n};
+ try{
+  for(let i=0;i<base.length;i+=200){
+   const now=new Date().toISOString();
+   const batch=base.slice(i,i+200).map(r=>{const bi=+r.id.slice(1);return{id:'o'+bi,doc:{id:'o'+bi,ov:1,bi,del:true},updated_at:now}});
+   const{error}=await sb.from(SB_TBL).upsert(batch);if(error)throw error;done+=batch.length;tick()}
+  for(let i=0;i<mine.length;i+=200){
+   const ids=mine.slice(i,i+200).map(r=>r.id);
+   const{error}=await sb.from(SB_TBL).delete().in('id',ids);if(error)throw error;done+=ids.length;tick()}
+  $('sync').textContent='تم حذف '+done.toLocaleString('ar-EG')+' مقايسة ✓';
+ }catch(e){
+  $('sync').textContent='';alert('حصل خطأ أثناء الحذف بعد '+done.toLocaleString('ar-EG')+' مقايسة: '+(e&&e.message||e)+'. حدّث الصفحة وجرّب تاني.')}
+ finally{btn.disabled=false}};
 function saveAll(){lsSet();$('sync').textContent='تم حفظ البيانات على هذا الجهاز ✓';}
 $('saveall').onclick=saveAll;
 /* مولّد ملفات Excel (.xlsx) مدمج — من غير أي مكتبة خارجية */
