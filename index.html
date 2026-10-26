@@ -134,7 +134,7 @@ body{background:linear-gradient(180deg,var(--pg1) 0%,var(--pg2) 100%) fixed!impo
 .card{border:0!important;border-radius:16px;box-shadow:0 10px 28px rgba(0,0,0,.22)}
 .card.stats{box-shadow:none}
 .st{background:#fff!important;border:0!important;border-top:4px solid var(--nv2)!important;border-radius:14px!important;box-shadow:0 8px 22px rgba(0,0,0,.22)!important;padding:14px 18px!important}
-.st:nth-child(2){border-top-color:#dc2626!important}.st:nth-child(3){border-top-color:var(--am)!important}
+.st:nth-child(2){border-top-color:var(--am)!important}
 .st b{font-size:26px;color:#0f172a}.st span{color:#475569!important;font-size:14px!important}
 .st[data-f].on{outline:3px solid var(--am)!important;outline-offset:2px}
 
@@ -220,12 +220,12 @@ tbody tr:not(.late):hover td{background:#f8fafc!important}
 <input id="su" placeholder="اسم المستخدم (حروف إنجليزي وأرقام)" autocomplete="username" autocapitalize="none"><input id="sp" type="password" placeholder="كلمة المرور (٨ حروف على الأقل)" autocomplete="new-password"><input id="sp2" type="password" placeholder="أعد كتابة كلمة المرور" autocomplete="new-password">
 <div id="smsg"></div><button class="p" id="sgb">إرسال طلب إنشاء الحساب</button><div class="sw"><a id="tolg">رجوع لتسجيل الدخول</a></div></div></div>
 <div class="w">
-<header class="hd"><div class="ht"><h1>📋 متابعة المقايسات</h1><p>ابحث عن أي مقايسة فورًا، وتابع المتأخر منها باللون الأحمر</p></div></header>
-<div class="card stats"><div class="st" data-f="all" role="button" tabindex="0" title="اعرض كل المقايسات"><b id="s1">0</b><span>إجمالي المقايسات</span></div><div class="st" data-f="late" role="button" tabindex="0" title="اعرض المتجاوزة بس"><b id="s2" style="color:var(--redtx)">0</b><span>تجاوزت ٥ أيام</span></div><div class="st" data-f="open" role="button" tabindex="0" title="اعرض اللي لسه ما اتسلمتش"><b id="s3">0</b><span>لم تُسلَّم بعد</span></div></div>
+<header class="hd"><div class="ht"><h1>📋 متابعة المقايسات</h1><p>ابحث عن أي مقايسة فورًا</p></div></header>
+<div class="card stats"><div class="st" data-f="all" role="button" tabindex="0" title="اعرض كل المقايسات"><b id="s1">0</b><span>إجمالي المقايسات</span></div><div class="st" data-f="open" role="button" tabindex="0" title="اعرض اللي لسه ما اتسلمتش"><b id="s3">0</b><span>لم تُسلَّم بعد</span></div></div>
 <div class="card"><input id="q" placeholder="ابحث بالشركة أو المشروع أو ك أو الملاحظات…" autocomplete="off">
-<div class="bar"><select id="flt"><option value="all">الكل</option><option value="late">المتجاوزة ٥ أيام فقط</option><option value="open">غير المسلَّمة فقط</option><option value="added">المضافة حديثًا</option></select>
+<div class="bar"><select id="flt"><option value="all">الكل</option><option value="open">غير المسلَّمة فقط</option><option value="added">المضافة حديثًا</option></select>
 <select id="yr"><option value="">كل السنوات</option></select><button id="kb" title="الكتايب">ك الكتايب</button><button id="pb" title="المشاريع وكتايبها">🏗️ المشاريع</button><button class="p" id="addb">+ إضافة مقايسة</button><button id="saveall">💾 حفظ البيانات</button><button id="exportExcel">⬇️ تحميل Excel</button><button id="rangeDel" hidden title="للمسؤول فقط">🗑️ مسح من ٢٠٢٢ إلى ٢٠٢٤</button><span class="mu" id="sync"></span></div></div>
-<div class="card fm" id="fm" hidden><h2 class="fh">إضافة مقايسة جديدة</h2><div class="fs">الحقول المعلّمة بـ * مطلوبة. لو المدة من تاريخ الاستلام لتاريخ التسليم زادت عن ٥ أيام، الصف هيظهر باللون الأحمر.</div><div class="f">
+<div class="card fm" id="fm" hidden><h2 class="fh">إضافة مقايسة جديدة</h2><div class="fs">الحقول المعلّمة بـ * مطلوبة.</div><div class="f">
 <label>الشركة <span class="req">*</span><input id="fc" placeholder="اسم الشركة"></label><label>ك<input id="fb" placeholder="ك" value="ك "></label>
 <label class="w2">المشروع <span class="req">*</span><input id="fp" placeholder="اسم المشروع"></label>
 <label>تاريخ الاستلام من المندوب <span class="req">*</span><input type="date" id="fr"></label><label>تاريخ التسليم لمكتب المقايسات<input type="date" id="fd"></label>
@@ -435,7 +435,7 @@ const ts=s=>s?Date.parse(s+'T00:00:00Z'):NaN;
 const nrm=s=>String(s||'').toLowerCase().replace(/[\u064B-\u0652\u0640]/g,'').replace(/[أإآ]/g,'ا').replace(/ى/g,'ي').replace(/ة/g,'ه');
 const esc=s=>String(s==null?'':s).replace(/[&<>"]/g,c=>({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;'}[c]));
 function mk(a,src,id){const r=ts(a[4]),d=ts(a[5]);const days=isNaN(r)||isNaN(d)?null:Math.round((d-r)/DAY);
-return{n:a[0],c:a[1],p:a[2],b:a[3],r:a[4],d:a[5],nt:a[6],f:a[7],l:a[8],pf:a[9],src,id,days,open:!a[5],overdue:days!==null&&days>GRACE,late:days!==null&&days>GRACE,k:nrm([a[1],a[2],a[3],a[6],a[7],a[0]].join(' '))}}
+return{n:a[0],c:a[1],p:a[2],b:a[3],r:a[4],d:a[5],nt:a[6],f:a[7],l:a[8],pf:a[9],src,id,days,open:!a[5],overdue:false,late:false,k:nrm([a[1],a[2],a[3],a[6],a[7],a[0]].join(' '))}}
 let rows=[];
 function build(){const ov={};added.forEach(x=>{if(x.ov)ov[x.bi]=x});
 /* ترقيم تسلسلي: آخر رقم مقايسة موجودة، والمقايسات المضافة القديمة بدون رقم تاخد أرقام بالترتيب حسب وقت الإضافة */
@@ -444,7 +444,7 @@ const lg={};added.filter(x=>!x.ov&&!(+x.n>0)).sort((a,b)=>String(a.id).localeCom
 rows=added.filter(x=>!x.ov).map(x=>mk([+x.n>0?x.n:lg[x.id],x.c,x.p,x.b,x.r,x.d,x.nt,'',x.l,x.pf],'a',x.id)).sort((a,b)=>(+a.n||0)-(+b.n||0));rows=BASE.map((a,i)=>{const o=ov[i];if(o&&o.del)return null;return mk(o?[a[0],o.c,o.p,o.b,o.r,o.d,o.nt,a[7],o.l,o.pf]:a,'b','b'+i)}).filter(Boolean).concat(rows);
 const ys=[...new Set(rows.map(r=>(r.r||'').slice(0,4)).filter(Boolean))].sort().reverse(),cur=$('yr').value;
 $('yr').innerHTML='<option value="">كل السنوات</option>'+ys.map(y=>`<option${y===cur?' selected':''}>${y}</option>`).join('');
-$('s1').textContent=(rows.reduce((m,r)=>Math.max(m,+r.n||0),0)+rows.filter(r=>r.src==='a'&&!(+r.n)).length).toLocaleString('ar-EG');$('s2').textContent=rows.filter(r=>r.late).length.toLocaleString('ar-EG');$('s3').textContent=rows.filter(r=>r.open).length.toLocaleString('ar-EG');apply()}
+$('s1').textContent=(rows.reduce((m,r)=>Math.max(m,+r.n||0),0)+rows.filter(r=>r.src==='a'&&!(+r.n)).length).toLocaleString('ar-EG');$('s3').textContent=rows.filter(r=>r.open).length.toLocaleString('ar-EG');apply()}
 let cfs=[];let jumpId=null;
 function cv(r,k){if(k==='days')return(r.days===null?'':r.days+' يوم')+(r.late?' تجاوزت':'');if(k==='d')return r.d||'لم تسلم';if(k==='nt')return r.nt||'';if(k==='file')return(r.f||'')+' '+(r.pf?'صورة':'');return r[k]}
 function colOk(r){for(const[k,ws]of cfs){const v=nrm(cv(r,k));for(const w of ws)if(!v.includes(w))return false}return true}
@@ -463,7 +463,7 @@ document.addEventListener('keydown',e=>{if(e.key==='Enter'&&e.target.classList.c
 let tm;$('q').oninput=()=>{clearTimeout(tm);tm=setTimeout(apply,150)};$('flt').onchange=apply;$('yr').onchange=apply;
 document.querySelector('.fr').addEventListener('input',()=>{clearTimeout(tm);tm=setTimeout(apply,200)});
 $('cf').onclick=()=>{document.querySelectorAll('.fr input').forEach(i=>i.value='');apply()};
-function showHint(){const r=ts($('fr').value),d=ts($('fd').value),el=$('fh');if(isNaN(r)){el.textContent='';el.className='hint';return}if(isNaN(d)){el.textContent='المدة هتتحسب أول ما تدخل تاريخ التسليم';el.className='hint';return}const n=Math.round((d-r)/DAY),bad=n>GRACE;el.className='hint '+(bad?'bad':'good');el.textContent=bad?`⚠️ المدة ${n} يوم – تجاوزت ${GRACE} أيام وهتظهر باللون الأحمر`:`✓ المدة ${n} يوم – ضمن المسموح`}
+function showHint(){const r=ts($('fr').value),d=ts($('fd').value),el=$('fh');if(isNaN(r)){el.textContent='';el.className='hint';return}if(isNaN(d)){el.textContent='المدة هتتحسب أول ما تدخل تاريخ التسليم';el.className='hint';return}const n=Math.round((d-r)/DAY),bad=false;el.className='hint '+(bad?'bad':'good');el.textContent=bad?`⚠️ المدة ${n} يوم – تجاوزت ${GRACE} أيام وهتظهر باللون الأحمر`:`المدة ${n} يوم`}
 ['fr','fd'].forEach(i=>$(i).addEventListener('change',showHint));
 $('addb').onclick=()=>{if(!can('add'))return;editing=null;setMode();['fc','fp','fb','fn','fd'].forEach(i=>$(i).value='');$('fb').value='ك ';$('ff').value='';pend=null;$('fcur').textContent='اختر صورة (سكرين شوت أو غيره) أو الصقها بـ Ctrl+V';$('fm').hidden=false;$('fr').value=new Date(today).toISOString().slice(0,10);showHint();$('fm').scrollIntoView();$('fc').focus()};
 let editing=null;
@@ -590,8 +590,8 @@ const sum=l=>({t:l.length,o:l.filter(r=>r.open).length,l:l.filter(r=>r.late).len
 const NOP='(بدون اسم مشروع)';
 const pkey=r=>nrm(String(r.p||'').trim()).replace(/\s+/g,' ')||'__none__';
 const byNew=(a,b)=>(+b.n||0)-(+a.n||0);
-const TABS={k:[['proj','المشاريع'],['all','كل المقايسات'],['prob','فيها مشكلة ولسه متحركتش'],['late','متأخرة (فوق ٥ أيام)'],['open','لم تُسلَّم بعد']],
- p:[['bat','حسب الكتيبة'],['all','كل المقايسات'],['prob','فيها مشكلة ولسه متحركتش'],['late','متأخرة (فوق ٥ أيام)'],['open','لم تُسلَّم بعد']]};
+const TABS={k:[['proj','المشاريع'],['all','كل المقايسات'],['prob','فيها مشكلة ولسه متحركتش'],['open','لم تُسلَّم بعد']],
+ p:[['bat','حسب الكتيبة'],['all','كل المقايسات'],['prob','فيها مشكلة ولسه متحركتش'],['open','لم تُسلَّم بعد']]};
 let st=null,dsh=null,scopeN=0;
 const fresh=(m,q)=>({m,k:null,title:'',tab:m==='k'?'proj':'bat',sub:null,subn:'',lim:m==='p'?60:100,q:q||''});
 
@@ -614,7 +614,7 @@ function table(list,noLim){
   return'<tr class="'+(r.late?'late':'')+'"><td>'+esc(r.n)+'</td><td>'+esc(r.c)+'</td><td>'+esc(r.p)+'</td><td>'+esc(r.b)+'</td><td>'+esc(r.r)+'</td><td>'+(r.d?esc(r.d):'<span class="tag">لم تُسلَّم</span>')+'</td><td>'+lt+'</td><td>'+esc(r.nt)+'</td><td>'+fileCell(r)+'</td></tr>'}).join('')+
  '</tbody></table></div>'+(list.length>part.length?'<div style="text-align:center;margin-top:10px"><button data-a="more">عرض المزيد ('+fmt(list.length-part.length)+' متبقي)</button></div>':'')}
 function statsBox(s,mid){const b=(t,v,l,c)=>'<div'+(t?' data-a="tab" data-t="'+t+'"':'')+' class="'+(c||'')+(t&&st.tab===t?' on':'')+'"><b>'+fmt(v)+'</b><span>'+l+'</span></div>';
- return'<div class="dpn"><div class="dst">'+b('all',s.t,'إجمالي المقايسات')+b(mid[0],mid[1],mid[2])+b('done',s.t-s.o,'مسلَّمة')+b('open',s.o,'لسه ما اتسلمتش','o')+b('late',s.l,'متأخرة','r')+b('prob',s.p,'فيها مشكلة ولسه','o')+'</div></div>'}
+ return'<div class="dpn"><div class="dst">'+b('all',s.t,'إجمالي المقايسات')+b(mid[0],mid[1],mid[2])+b('done',s.t-s.o,'مسلَّمة')+b('open',s.o,'لسه ما اتسلمتش','o')+b('prob',s.p,'فيها مشكلة ولسه','o')+'</div></div>'}
 function tabsBar(cnt){return'<div class="dtabs">'+TABS[st.m].map(t=>'<button data-a="tab" data-t="'+t[0]+'" class="'+(st.tab===t[0]?'on':'')+'">'+t[1]+' ('+fmt(cnt[t[0]])+')</button>').join('')+'</div>'}
 const noRes='<div class="dpn dpe">مفيش نتايج للبحث ده</div>';
 
