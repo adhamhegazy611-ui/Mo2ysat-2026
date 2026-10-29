@@ -8,7 +8,7 @@ module.exports = async (req, res) => {
   if (!token) return res.status(401).json({ error: 'unauthorized' });
   try {
     // the app_users row is only visible to its owner (RLS), so this checks both a valid login and an active account
-    const r = await fetch(URL_ + '/rest/v1/app_users?select=role', {
+    const r = await fetch(URL_ + '/rest/v1/app_users?select=role,battalions', {
       headers: { apikey: KEY, Authorization: 'Bearer ' + token },
     });
     const rows = r.ok ? await r.json() : [];
@@ -16,7 +16,12 @@ module.exports = async (req, res) => {
     const file = path.join(process.cwd(), 'api', '_data', 'base.json');
     res.setHeader('Content-Type', 'application/json; charset=utf-8');
     res.setHeader('Cache-Control', 'private, no-store');
-    return res.status(200).send(fs.readFileSync(file));
+    const bats = (rows[0] && Array.isArray(rows[0].battalions)) ? rows[0].battalions.map(String) : [];
+    if (!bats.length) return res.status(200).send(fs.readFileSync(file));
+    // حساب كتيبة: بيستلم مقايسات كتيبته بس (السيرفر هو اللي بيفلتر، مش الشاشة)
+    const all = JSON.parse(fs.readFileSync(file, 'utf8'));
+    const mine = all.filter(r => (String(r[3] || '').match(/\d+/g) || []).some(n => bats.includes(n)));
+    return res.status(200).send(JSON.stringify(mine));
   } catch (e) {
     return res.status(500).json({ error: 'server' });
   }
