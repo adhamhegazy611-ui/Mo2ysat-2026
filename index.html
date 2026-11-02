@@ -244,7 +244,9 @@ const SB_DOM='@mo2ysaat.app',SB_TBL='estimates_added';
 const IDLE_MIN=30;
 try{Object.keys(localStorage).filter(k=>/^sb-.*-auth-token/.test(k)).forEach(k=>localStorage.removeItem(k))}catch(e){}
 let AUTH_STORE;try{sessionStorage.setItem('_t','1');sessionStorage.removeItem('_t');AUTH_STORE=sessionStorage}catch(e){AUTH_STORE=undefined}
-const sb=supabase.createClient(SB_URL,SB_KEY,{auth:{storage:AUTH_STORE,persistSession:!!AUTH_STORE,autoRefreshToken:true}});
+/* دخول مباشر من البوابة: البوابة بتبعت الجلسة في الرابط، بناخدها ونمسحها من شريط العنوان */
+const SSO=(()=>{try{const h=new URLSearchParams(location.hash.slice(1));const a=h.get('access_token'),r=h.get('refresh_token');if(a&&r){history.replaceState(null,'',location.pathname+location.search);return{access_token:a,refresh_token:r}}}catch(e){}return null})();
+const sb=supabase.createClient(SB_URL,SB_KEY,{auth:{storage:AUTH_STORE,persistSession:!!AUTH_STORE,autoRefreshToken:true,detectSessionInUrl:false}});
 const ssGet=k=>{try{return sessionStorage.getItem(k)}catch(e){return null}},ssSet=(k,v)=>{try{sessionStorage.setItem(k,v)}catch(e){}};
 async function idleOut(){try{await sb.auth.signOut()}catch(e){}ssSet('idleOut','1');location.reload()}
 function idleSetup(){let w=0;const touch=()=>{const n=Date.now();if(n-w>15000){w=n;ssSet('lastAct',String(n))}};touch();
@@ -314,6 +316,7 @@ document.addEventListener('DOMContentLoaded',async()=>{
  $l('lb').onclick=doLogin;$l('lp').onkeydown=e=>{if(e.key==='Enter')doLogin()};$l('lu').onkeydown=e=>{if(e.key==='Enter')$l('lp').focus()};
  if(ssGet('kicked')){$l('lerr').textContent=ssGet('kicked');try{sessionStorage.removeItem('kicked')}catch(e){}}
  else if(ssGet('idleOut')){$l('lerr').textContent='اتعملك خروج تلقائي بعد '+IDLE_MIN+' دقيقة من غير استخدام. ادخل تاني.';try{sessionStorage.removeItem('idleOut')}catch(e){}}
+ if(SSO){try{ssSet('lastAct',String(Date.now()));const{data:d,error:er}=await sb.auth.setSession(SSO);if(!er&&d.session)return enter(d.session)}catch(e){}}
  const{data}=await sb.auth.getSession();if(data.session)enter(data.session,true);
 });
 </script>
