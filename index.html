@@ -682,4 +682,6 @@ function pick(f){$('q').value='';$('yr').value='';document.querySelectorAll('.fr
 cards.forEach(c=>{c.addEventListener('click',()=>pick(c.dataset.f));c.addEventListener('keydown',e=>{if(e.key==='Enter'||e.key===' '){e.preventDefault();pick(c.dataset.f)}})});
 $('flt').addEventListener('change',syncCards);
 })();
-</script></body></html>
+</script><a class="portal-back" href="https://tasmemat.vercel.app/" title="رجوع لبوابة الأنظمة">→ البوابة</a>
+<style>.portal-back{position:fixed;bottom:16px;left:16px;z-index:9999;display:inline-flex;align-items:center;gap:6px;background:#0b1b33;color:#fff;text-decoration:none;font-weight:700;font-size:13.5px;padding:9px 15px;border-radius:999px;box-shadow:0 6px 20px rgba(0,0,0,.28);border:1px solid rgba(255,255,255,.18)}.portal-back:hover{background:#132a4d}@media print{.portal-back{display:none}}</style>
+</body></html>
