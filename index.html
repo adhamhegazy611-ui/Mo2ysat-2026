@@ -368,8 +368,17 @@ function setupAccountTools(m){
  const row=document.createElement('div');row.className='hrow';
  const pw=document.createElement('button');pw.textContent='🔑 تغيير كلمة المرور';pw.onclick=openPwModal;row.appendChild(pw);
  if(m&&m.role==='admin'){const rq=document.createElement('button');rq.id='rqb';rq.innerHTML='👥 المستخدمين والطلبات';rq.onclick=openReqModal;row.appendChild(rq);refreshReqCount()}
+ if(m&&m.role==='admin'){const sy=document.createElement('button');sy.id='dsb';sy.innerHTML='🔄 تحديث من Drive';sy.onclick=driveSync;row.appendChild(sy);lastSync()}
  const lo=document.getElementById('lo');if(lo)row.appendChild(lo);
  hd.appendChild(row)}
+/* التحديث من شيت «متابعة المقايسات» على Drive: بيحصل لوحده كل يوم الصبح، والزرار ده للتحديث الفوري */
+async function lastSync(){try{const{data}=await sb.from('sync_log').select('at,ok,summary').eq('site','mq').order('at',{ascending:false}).limit(1);const b=document.getElementById('dsb');if(!b||!data||!data[0])return;const x=data[0],t=new Date(x.at).toLocaleString('ar-EG',{day:'numeric',month:'short',hour:'numeric',minute:'2-digit'});b.title=(x.ok?'آخر تحديث من Drive: ':'⚠️ آخر محاولة فشلت: ')+t+' — '+x.summary;if(!x.ok)b.innerHTML='⚠️ تحديث من Drive'}catch(e){}}
+async function driveSync(){const b=document.getElementById('dsb');if(!confirm('تحديث المقايسات من شيت Drive دلوقتي؟\n(الفاضي في الشيت مش بيمسح حاجة، ومفيش حاجة بتتحذف)'))return;
+ b.disabled=true;b.innerHTML='⏳ جاري التحديث…';
+ try{const{data:{session:s}}=await sb.auth.getSession();const r=await fetch('/api/sync?site=mq',{method:'POST',headers:{Authorization:'Bearer '+s.access_token}});const j=await r.json();const x=j.mq||{};
+  if(!r.ok||!x.ok){b.innerHTML='⚠️ تحديث من Drive';b.disabled=false;$('sync').textContent='⚠️ التحديث فشل: '+(x.error||j.error||r.status);return}
+  $('sync').textContent='✓ '+x.summary+' — بيعيد التحميل…';setTimeout(()=>location.reload(),1500)}
+ catch(e){b.innerHTML='⚠️ تحديث من Drive';b.disabled=false;$('sync').textContent='⚠️ التحديث فشل، اتأكد من النت'}}
 async function refreshReqCount(){
  const b=document.getElementById('rqb');if(!b)return;
  const{count}=await sb.from('signup_requests').select('user_id',{count:'exact',head:true}).eq('status','pending');
@@ -449,9 +458,9 @@ return{n:a[0],c:a[1],p:a[2],b:a[3],r:a[4],d:a[5],nt:a[6],f:a[7],l:a[8],pf:a[9],s
 let rows=[];
 function build(){const ov={};added.forEach(x=>{if(x.ov)ov[x.bi]=x});
 /* ترقيم تسلسلي: آخر رقم مقايسة موجودة، والمقايسات المضافة القديمة بدون رقم تاخد أرقام بالترتيب حسب وقت الإضافة */
-let mx=BASE.reduce((m,a)=>Math.max(m,+a[0]||0),0);added.forEach(x=>{if(!x.ov&&+x.n>0)mx=Math.max(mx,+x.n)});
-const lg={};added.filter(x=>!x.ov&&!(+x.n>0)).sort((a,b)=>String(a.id).localeCompare(String(b.id))).forEach(x=>{lg[x.id]=++mx});
-rows=added.filter(x=>!x.ov).map(x=>mk([+x.n>0?x.n:lg[x.id],x.c,x.p,x.b,x.r,x.d,x.nt,'',x.l,x.pf],'a',x.id)).sort((a,b)=>(+a.n||0)-(+b.n||0));rows=BASE.map((a,i)=>{const o=ov[i];if(o&&o.del)return null;return mk(o?[a[0],o.c,o.p,o.b,o.r,o.d,o.nt,a[7],o.l,o.pf]:a,'b','b'+i)}).filter(Boolean).concat(rows);
+let mx=BASE.reduce((m,a)=>Math.max(m,+a[0]||0),0);added.forEach(x=>{if(!x.ov&&!x.dup&&+x.n>0)mx=Math.max(mx,+x.n)});
+const lg={};added.filter(x=>!x.ov&&!x.dup&&!(+x.n>0)).sort((a,b)=>String(a.id).localeCompare(String(b.id))).forEach(x=>{lg[x.id]=++mx});
+rows=added.filter(x=>!x.ov&&!x.dup).map(x=>mk([+x.n>0?x.n:lg[x.id],x.c,x.p,x.b,x.r,x.d,x.nt,'',x.l,x.pf],'a',x.id)).sort((a,b)=>(+a.n||0)-(+b.n||0));rows=BASE.map((a,i)=>{const o=ov[i];if(o&&o.del)return null;return mk(o?[a[0],o.c,o.p,o.b,o.r,o.d,o.nt,a[7],o.l,o.pf]:a,'b','b'+i)}).filter(Boolean).concat(rows);
 const ys=[...new Set(rows.map(r=>(r.r||'').slice(0,4)).filter(Boolean))].sort().reverse(),cur=$('yr').value;
 $('yr').innerHTML='<option value="">كل السنوات</option>'+ys.map(y=>`<option${y===cur?' selected':''}>${y}</option>`).join('');
 $('s1').textContent=((ME.bats&&ME.bats.length)?rows.length:(rows.reduce((m,r)=>Math.max(m,+r.n||0),0)+rows.filter(r=>r.src==='a'&&!(+r.n)).length)).toLocaleString('ar-EG');$('s3').textContent=rows.filter(r=>r.open).length.toLocaleString('ar-EG');apply()}

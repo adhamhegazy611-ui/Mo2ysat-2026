@@ -13,13 +13,22 @@ module.exports = async (req, res) => {
     });
     const rows = r.ok ? await r.json() : [];
     if (!Array.isArray(rows) || rows.length === 0) return res.status(403).json({ error: 'forbidden' });
-    const file = path.join(process.cwd(), 'api', '_data', 'base.json');
     res.setHeader('Content-Type', 'application/json; charset=utf-8');
     res.setHeader('Cache-Control', 'private, no-store');
+    // البيانات الأساسية بقت في قاعدة البيانات (بتتحدث كل يوم من شيت Drive)، والملف احتياطي لو لسه ماتحدثتش
+    let all = null;
+    const SRK = process.env.SUPABASE_SERVICE_ROLE_KEY;
+    if (SRK) {
+      try {
+        const q = await fetch(URL_ + '/rest/v1/mq_base?select=rows&id=eq.1', { headers: { apikey: SRK, Authorization: 'Bearer ' + SRK } });
+        const j = q.ok ? await q.json() : [];
+        if (Array.isArray(j) && j[0] && Array.isArray(j[0].rows)) all = j[0].rows;
+      } catch (e) { /* fallback */ }
+    }
+    if (!all) all = JSON.parse(fs.readFileSync(path.join(process.cwd(), 'api', '_data', 'base.json'), 'utf8'));
     const bats = (rows[0] && Array.isArray(rows[0].battalions)) ? rows[0].battalions.map(String) : [];
-    if (!bats.length) return res.status(200).send(fs.readFileSync(file));
+    if (!bats.length) return res.status(200).send(JSON.stringify(all));
     // حساب كتيبة: بيستلم مقايسات كتيبته بس (السيرفر هو اللي بيفلتر، مش الشاشة)
-    const all = JSON.parse(fs.readFileSync(file, 'utf8'));
     const mine = all.filter(r => (String(r[3] || '').match(/\d+/g) || []).some(n => bats.includes(n)));
     return res.status(200).send(JSON.stringify(mine));
   } catch (e) {
