@@ -112,7 +112,8 @@ function planMz(recs, db) {
       if (!same(v, d[k])) patch[k] = v;
     }
     const col = { ...(d.colors || {}), ...r.colors };
-    if (JSON.stringify(col) !== JSON.stringify(d.colors || {})) patch.colors = col;
+    const sk = (o) => JSON.stringify(Object.keys(o).sort().map((k) => [k, o[k]]));
+    if (sk(col) !== sk(d.colors || {})) patch.colors = col;
     if (Object.keys(patch).length) updates.push({ id: d.id, name: d.name, patch });
   });
   return { updates, inserts };
