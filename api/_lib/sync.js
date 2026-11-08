@@ -136,73 +136,45 @@ async function runMz(link, dry) {
 }
 
 /* ======================= المقايسات ======================= */
+// المقايسات: بنضيف بس المقايسات اللي بعد آخر مقايسة اتاخدت من الشيت (last_n)، ومش بنعدّل القديم.
 // صف المقايسة: [م، الشركة، المشروع، الكتيبة، تاريخ الاستلام، تاريخ التسليم، ملاحظات، ملف PDF]
 const tx = (v) => (v == null ? '' : String(v).replace(/\r\n?/g, '\n').trim());
-function parseMq(wb, minN) {
+function parseMqAfter(wb, lastN) {
   const ws = wb.sheets[0];
   const h = (c) => tx((ws.get(1, c) || {}).v);
   if (!/الشركة/.test(h(2)) || !/المشروع/.test(h(3)) || !/الكتيبة/.test(h(4))) throw new Error('شكل شيت المقايسات اتغير (عناوين الأعمدة مش في مكانها) — مفيش حاجة اتحدثت');
-  const out = [];
+  const out = []; let seen = false, maxN = 0;
   for (let r = 2; r <= ws.rows; r++) {
     const g = (c) => { const x = ws.get(r, c); return x ? x.v : null; };
-    const c = tx(g(2)); if (!c) continue;
     const n0 = g(1), n = typeof n0 === 'number' ? n0 : '';
+    if (n !== '' && n > maxN) maxN = n;
+    if (n === lastN) { seen = true; continue; }
+    const c = tx(g(2)); if (!c) continue;
+    // بعد آخر مقايسة: أي رقم أكبر منها، أو صف من غير رقم جاي بعدها في الشيت
+    if (n !== '' ? n <= lastN : !seen) continue;
     const notes = [];
     const dt = (v) => { if (v == null || v === '') return ''; const d = xlDate(v); if (d) return d; notes.push(tx(v)); return ''; };
     const rd = dt(g(5)), dd = dt(g(6));
-    if (n !== '' ? n < minN : !(rd >= '2025-01-01' || dd >= '2025-01-01')) continue;
     out.push([n, c, tx(g(3)), tx(g(4)), rd, dd, notes.filter(Boolean).join(' '), tx(g(7))]);
   }
+  if (maxN < lastN) throw new Error('آخر رقم في الشيت ' + maxN + ' وده أقل من آخر مقايسة اتاخدت (' + lastN + ') — اتأكد إنه الشيت الصح، مفيش حاجة اتحدثت');
   return out;
 }
 
-function planMq(rows, base, added) {
-  const bkey = (a) => (a[0] !== '' && a[0] != null ? 'n:' + a[0] : 'k:' + norm(a[1]) + '|' + norm(a[2]) + '|' + norm(a[7]));
-  const idx = new Map(); base.forEach((a, i) => { const k = bkey(a); (idx.get(k) || idx.set(k, []).get(k)).push(i); });
-  const next = base.map((a) => a.slice());
-  let changed = 0; const appended = [], sample = [];
-  for (const r of rows) {
-    const list = idx.get(bkey(r)); const i = list && list.length ? list.shift() : -1;
-    if (i < 0) { next.push(r); appended.push(r); continue; }
-    const a = next[i]; let ch = false;
-    for (let k = 1; k < 8; k++) if (r[k] !== '' && r[k] !== a[k]) { if (sample.length < 15) sample.push({ n: a[0], col: k, from: a[k], to: r[k] }); a[k] = r[k]; ch = true; }
-    if (ch) changed++;
-  }
-  // المقايسات اللي اتضافت من الموقع وليها نفس الشركة والمشروع والتاريخ في الشيت → تستخبى (مش بتتمسح)
-  const pool = new Map();
-  next.forEach((a, i) => { if (!a[4]) return; const k = a[4] + '|' + norm(a[1]); (pool.get(k) || pool.set(k, []).get(k)).push(i); });
-  const usedB = new Set(), dups = [];
-  for (const x of added) {
-    if (x.ov || x.dup) continue;
-    const cand = (pool.get((x.r || '') + '|' + norm(x.c)) || []).filter((i) => !usedB.has(i));
-    const px = norm(x.p);
-    const i = cand.find((j) => { const pb = norm(next[j][2]); return pb === px || (px && pb.includes(px)) || (pb && px.includes(pb)); });
-    if (i != null) { usedB.add(i); dups.push({ id: x.id, n: x.n, c: x.c, p: x.p, as: next[i][0] }); }
-  }
-  return { next, changed, appended, sample, dups };
-}
-
 async function runMq(link, dry) {
-  const rowsDb = await sb('/rest/v1/mq_base?select=rows&id=eq.1');
+  const rowsDb = await sb('/rest/v1/mq_base?select=rows,last_n&id=eq.1');
   const base = rowsDb.length ? rowsDb[0].rows : JSON.parse(fs.readFileSync(path.join(process.cwd(), 'api', '_data', 'base.json'), 'utf8'));
-  const minN = base.reduce((m, a) => (typeof a[0] === 'number' && a[0] < m ? a[0] : m), Infinity);
-  const rows = parseMq(readXlsx(await download(link)), isFinite(minN) ? minN : 0);
-  if (rows.length < base.length * 0.8) throw new Error('الشيت فيه ' + rows.length + ' مقايسة بس والموقع فيه ' + base.length + ' — شكله ناقص، مفيش حاجة اتحدثت');
-  const added = (await sb('/rest/v1/estimates_added?select=id,doc')).map((d) => ({ id: d.id, ...d.doc }));
-  const { next, changed, appended, sample, dups } = planMq(rows, base, added);
-  if (!dry) {
-    if (changed || appended.length || !rowsDb.length) {
-      await sb('/rest/v1/mq_base', { method: 'POST', headers: { Prefer: 'resolution=merge-duplicates' }, body: JSON.stringify({ id: 1, rows: next, updated_at: new Date().toISOString() }) });
-    }
-    for (const d of dups) {
-      const x = added.find((a) => a.id === d.id); const { id, ...doc } = x;
-      await sb('/rest/v1/estimates_added?id=eq.' + encodeURIComponent(id), { method: 'PATCH', body: JSON.stringify({ doc: { ...doc, dup: true, dupOf: d.as }, updated_at: new Date().toISOString() }) });
-    }
+  const lastN = rowsDb.length && rowsDb[0].last_n != null ? rowsDb[0].last_n : Number(process.env.MQ_AFTER);
+  if (!lastN) throw new Error('آخر مقايسة مش متسجلة');
+  const add = parseMqAfter(readXlsx(await download(link)), lastN);
+  const newLast = add.reduce((m, a) => (typeof a[0] === 'number' && a[0] > m ? a[0] : m), lastN);
+  if (!dry && (add.length || !rowsDb.length)) {
+    await sb('/rest/v1/mq_base', { method: 'POST', headers: { Prefer: 'resolution=merge-duplicates' },
+      body: JSON.stringify({ id: 1, rows: base.concat(add), last_n: newLast, updated_at: new Date().toISOString() }) });
   }
   return {
-    summary: `اتعدّل ${changed} مقايسة واتضاف ${appended.length}` + (dups.length ? ` واستخبى ${dups.length} مكرر من المضاف من الموقع` : ''),
-    stats: { sheet: rows.length, base: base.length, total: next.length, updated: changed, appended: appended.length, dups: dups.length,
-      sample, newFirst: appended.slice(0, 5), newLast: appended.slice(-3), dupList: dups },
+    summary: add.length ? `اتضاف ${add.length} مقايسة جديدة (من ${add[0][0] || '—'} لحد ${newLast})` : `مفيش مقايسات جديدة بعد رقم ${lastN}`,
+    stats: { after: lastN, added: add.length, last: newLast, total: base.length + add.length, first: add.slice(0, 3), lastRows: add.slice(-2) },
   };
 }
 
@@ -210,4 +182,4 @@ async function log(site, ok, trigger, summary, stats) {
   try { await sb('/rest/v1/sync_log', { method: 'POST', body: JSON.stringify({ site, ok, trigger, summary, stats }) }); } catch (e) { /* ignore */ }
 }
 
-module.exports = { sb, runMz, runMq, log, parseMz, parseMq, planMz, planMq, norm };
+module.exports = { sb, runMz, runMq, log, parseMz, parseMqAfter, planMz, norm };

@@ -36,7 +36,7 @@ module.exports = async (req, res) => {
   const dry = q.dry === '1';
   const jobs = [];
   if (site === 'all' || site === 'mz') jobs.push(['mz', process.env.SHEET_MZ, runMz]);
-  if ((site === 'all' && process.env.SHEET_MQ) || site === 'mq') jobs.push(['mq', process.env.SHEET_MQ, runMq]); // المقايسات متوقفة لحد ما لينكها يتسجل
+  if (site === 'all' || site === 'mq') jobs.push(['mq', process.env.SHEET_MQ, runMq]);
   const out = {};
   for (const [s, link, fn] of jobs) {
     try {
