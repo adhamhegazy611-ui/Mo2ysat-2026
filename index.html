@@ -371,7 +371,7 @@ function setupAccountTools(m){
  if(m&&m.role==='admin'){const sy=document.createElement('button');sy.id='dsb';sy.innerHTML='🔄 تحديث من Drive';sy.onclick=driveSync;row.appendChild(sy);lastSync()}
  const lo=document.getElementById('lo');if(lo)row.appendChild(lo);
  hd.appendChild(row)}
-/* التحديث من شيت «متابعة المقايسات» على Drive: بيحصل لوحده كل يوم الصبح، والزرار ده للتحديث الفوري */
+/* التحديث من شيت «متابعة المقايسات» على Drive: بيحصل لوحده كل يوم الساعة 10 بالليل، والزرار ده للتحديث الفوري */
 async function lastSync(){try{const{data}=await sb.from('sync_log').select('at,ok,summary').eq('site','mq').order('at',{ascending:false}).limit(1);const b=document.getElementById('dsb');if(!b||!data||!data[0])return;const x=data[0],t=new Date(x.at).toLocaleString('ar-EG',{day:'numeric',month:'short',hour:'numeric',minute:'2-digit'});b.title=(x.ok?'آخر تحديث من Drive: ':'⚠️ آخر محاولة فشلت: ')+t+' — '+x.summary;if(!x.ok)b.innerHTML='⚠️ تحديث من Drive'}catch(e){}}
 async function driveSync(){const b=document.getElementById('dsb');if(!confirm('تحديث المقايسات من شيت Drive دلوقتي؟\n(الفاضي في الشيت مش بيمسح حاجة، ومفيش حاجة بتتحذف)'))return;
  b.disabled=true;b.innerHTML='⏳ جاري التحديث…';

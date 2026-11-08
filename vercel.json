@@ -3,5 +3,5 @@
     "api/base.js": { "includeFiles": "api/_data/**" },
     "api/sync.js": { "includeFiles": "api/_data/**", "maxDuration": 60 }
   },
-  "crons": [{ "path": "/api/sync", "schedule": "0 6 * * *" }]
+  "crons": [{ "path": "/api/sync", "schedule": "0 20 * * *" }]
 }
