@@ -14,18 +14,34 @@ async function rest(p, opt = {}) {
 const folderId = (s) => { const m = /\/folders\/([\w-]{20,})/.exec(s || '') || /[?&]id=([\w-]{20,})/.exec(s || ''); return m ? m[1] : (s || '').trim(); };
 const ent = (s) => s.replace(/&amp;/g, '&').replace(/&quot;/g, '"').replace(/&#39;/g, "'").replace(/&lt;/g, '<').replace(/&gt;/g, '>');
 
+const UA = { 'User-Agent': 'Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/124.0 Safari/537.36', 'Accept-Language': 'en-US,en;q=0.9' };
 async function listFolder(link) {
   const id = folderId(link); if (!id) throw new Error('لينك فولدر الشيتات مش متسجل');
-  const r = await fetch('https://drive.google.com/embeddedfolderview?id=' + id, { redirect: 'follow' });
-  if (!r.ok) throw new Error('Drive رجّع ' + r.status + ' — اتأكد إن الفولدر متشارك «Anyone with the link»');
-  const html = await r.text(), out = [];
-  const re = /id="entry-([\w-]{20,})"[\s\S]*?class="flip-entry-title">([^<]*)</g; let m;
-  while ((m = re.exec(html))) out.push({ id: m[1], name: ent(m[2]).trim() });
-  if (!out.length && /ServiceLogin|accounts\.google/.test(html)) throw new Error('الفولدر مش متشارك «Anyone with the link»');
-  return out;
+  const st = [];
+  // 1) العرض المضمّن للفولدر
+  try {
+    const r = await fetch('https://drive.google.com/embeddedfolderview?id=' + id, { redirect: 'follow', headers: UA });
+    st.push('embedded ' + r.status);
+    if (r.ok) {
+      const html = await r.text(), out = []; const re = /id="entry-([\w-]{20,})"[\s\S]*?class="flip-entry-title">([^<]*)</g; let m;
+      while ((m = re.exec(html))) out.push({ id: m[1], name: ent(m[2]).trim() });
+      if (out.length) return out;
+    }
+  } catch (e) { st.push('embedded ' + e.message); }
+  // 2) صفحة الفولدر نفسها (البيانات جواها بصيغة JS)
+  const r = await fetch('https://drive.google.com/drive/folders/' + id, { redirect: 'follow', headers: UA });
+  st.push('folder ' + r.status);
+  if (r.ok) {
+    const html = (await r.text()).replace(/\\x([0-9a-fA-F]{2})/g, (_, h) => String.fromCharCode(parseInt(h, 16))).replace(/\\u([0-9a-fA-F]{4})/g, (_, h) => String.fromCharCode(parseInt(h, 16))).replace(/\\\//g, '/').replace(/\\"/g, '"');
+    const out = [], seen = new Set(); const re = /\["([\w-]{25,})",\["([\w-]{20,})"\],"([^"]{1,250})","(application\/[^"]+)"/g; let m;
+    while ((m = re.exec(html))) { if (m[2] === id && !seen.has(m[1])) { seen.add(m[1]); out.push({ id: m[1], name: m[3] }); } }
+    if (out.length) return out;
+    if (/ServiceLogin|accounts\.google\.com\/v3\/signin/.test(html)) st.push('login');
+  }
+  throw new Error('مقدرتش أقرا الفولدر (' + st.join('، ') + ') — اتأكد إن الفولدر متشارك «Anyone with the link»');
 }
 async function download(id) {
-  const r = await fetch('https://drive.google.com/uc?export=download&id=' + id, { redirect: 'follow' });
+  const r = await fetch('https://drive.google.com/uc?export=download&id=' + id, { redirect: 'follow', headers: UA });
   if (!r.ok) throw new Error('Drive ' + r.status);
   let buf = Buffer.from(await r.arrayBuffer());
   if (buf.readUInt32LE(0) !== 0x04034b50) { // ملف كبير: Drive بيطلب تأكيد
