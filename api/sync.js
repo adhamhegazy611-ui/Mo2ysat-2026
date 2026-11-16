@@ -2,6 +2,7 @@
 // كل يوم أوتوماتيك (Vercel Cron)، أو من زرار «حدّث من Drive» للمدير في الموازنات والمقايسات.
 // ?site=mz (الموازنات) | mq (المقايسات) | all — ?dry=1 بيوري اللي هيتغير من غير ما يحفظ
 const { sb, runMz, runMq, log } = require('./_lib/sync');
+const { runSheets } = require('./_lib/sheets');
 const URL_ = 'https://qadrtqtydtgzachfzpqw.supabase.co';
 
 async function isAdmin(token) {
@@ -41,6 +42,11 @@ module.exports = async (req, res) => {
   for (const [s, link, fn] of jobs) {
     try {
       const r = await fn(link, dry);
+      // مع الموازنات: شيتات المشاريع من فولدر Drive (لو متسجل)
+      if (s === 'mz' && process.env.SHEETS_FOLDER) {
+        try { const sh = await runSheets(process.env.SHEETS_FOLDER, dry); r.summary = (r.summary || '') + ' | ' + sh.summary; r.sheets = sh.stats; }
+        catch (e) { r.summary = (r.summary || '') + ' | شيتات: ' + e.message; }
+      }
       out[s] = { ok: true, ...r };
       if (!dry) await log(s, true, trigger, r.summary, r.stats);
     } catch (e) {
