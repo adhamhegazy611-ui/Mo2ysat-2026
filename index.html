@@ -214,7 +214,16 @@ tbody tr:not(.late):hover td{background:#f8fafc!important}
 @media(max-width:640px){.hrow{width:100%;display:grid;grid-template-columns:1fr 1fr}.hd button{min-width:0;width:100%;white-space:nowrap;font-size:12px;padding:0 8px}.hrow #lo{grid-column:1/-1}#dsh .dtop{flex-wrap:wrap}#dsh .dtop>div{width:100%}#dsh .dtop>div:last-child{display:grid!important;grid-template-columns:1fr 1fr 1fr}.dmode{display:contents}#dsh .dtop button{min-width:0;padding:0 8px}#dsh .dtabs button{flex:1 1 calc(50% - 8px);min-width:0;font-size:13px;padding:0 8px}.dst div{min-width:calc(50% - 10px)}#dsh .dsr button{min-width:70px}}
 </style>
 <style>.tw th:nth-child(5),.tw th:nth-child(6),.tw td:nth-child(5),.tw td:nth-child(6){white-space:nowrap;min-width:125px}.tag.chk{color:#b45309!important;background:#fef3c7!important;border-color:#f59e0b!important;white-space:nowrap}tbody tr.chk td:first-child{border-right:4px solid #f59e0b!important}.tw th:nth-child(7),.tw td:nth-child(7),.tw th:nth-child(9),.tw td:nth-child(9){display:none!important}
-</style><style id="fullw">.w{max-width:none!important;width:100%;padding:14px 20px 30px!important}</style><script>try{if(window.top!==window.self)document.documentElement.classList.add("framed")}catch(e){document.documentElement.classList.add("framed")}</script><style>html.framed .portal-back,html.framed a.portal{display:none!important}</style></head><body><div id="lgn"><div class="b"><h1>📋 متابعة المقايسات</h1><p>سجّل الدخول للمتابعة</p>
+</style><style id="fullw">.w{max-width:none!important;width:100%;padding:14px 20px 30px!important}</style><script>try{if(window.top!==window.self)document.documentElement.classList.add("framed")}catch(e){document.documentElement.classList.add("framed")}</script><style>html.framed .portal-back,html.framed a.portal{display:none!important}</style><style id="prs-css">#prs{position:fixed;inset:0;z-index:150;overflow:auto;padding:0 14px 24px;background:linear-gradient(180deg,var(--pg1) 0%,var(--pg2) 100%)}#prs[hidden]{display:none}
+#prs .dtop h2{color:#fff;margin:0}#prs .dtop{display:flex;justify-content:space-between;align-items:center;flex-wrap:wrap;gap:8px}#prs .dtop button{height:42px;padding:0 16px;border-radius:10px;font-weight:600}
+#prs .pf{display:grid;grid-template-columns:repeat(auto-fit,minmax(200px,1fr));gap:10px}#prs .pf .w2{grid-column:1/-1}
+#prs .pf label{display:flex;flex-direction:column;gap:4px;font-weight:600}#prs textarea{min-height:80px;font:inherit;padding:10px;border-radius:10px;border:1px solid #cbd5e1}
+#prs .pi{display:flex;gap:12px;align-items:flex-start;flex-wrap:wrap}#prs .pi img{width:110px;height:110px;object-fit:cover;border-radius:10px;cursor:zoom-in;background:#fff;border:1px solid #cbd5e1}
+#prs .pi .tx{flex:1;min-width:200px}#prs .pi .pr{white-space:pre-wrap;margin:6px 0;font-size:15px}
+#prs .bd{display:inline-block;padding:2px 10px;border-radius:999px;font-size:12.5px;font-weight:700}#prs .bd.o{background:#fee2e2;color:#991b1b}#prs .bd.d{background:#dcfce7;color:#166534}
+#prs .pt{display:flex;gap:8px;margin-bottom:12px;flex-wrap:wrap}#prs .pt button.on{background:var(--am);border-color:var(--am);color:#1c1100}
+#prs .acts{display:flex;gap:6px;flex-wrap:wrap;margin-top:6px}</style>
+</head><body><div id="lgn"><div class="b"><h1>📋 متابعة المقايسات</h1><p>سجّل الدخول للمتابعة</p>
 <input id="lu" placeholder="اسم المستخدم" autocomplete="username" autocapitalize="none"><input id="lp" type="password" placeholder="كلمة المرور" autocomplete="current-password">
 <div id="lerr"></div><button class="p" id="lb">دخول</button><div class="sw"><a id="tosu">إنشاء حساب جديد</a></div></div>
 <div class="b" id="sgn" style="display:none"><h1>📋 إنشاء حساب جديد</h1><p>الطلب بيوصل للمسؤول، وبعد موافقته تقدر تدخل</p>
@@ -226,7 +235,7 @@ tbody tr:not(.late):hover td{background:#f8fafc!important}
 <div class="card"><input id="q" placeholder="ابحث بالشركة أو المشروع أو ك أو الملاحظات…" autocomplete="off">
 </div>
 <div class="card"><div class="bar"><select id="flt"><option value="all">الكل</option><option value="open">غير المسلَّمة فقط</option><option value="check">⚠️ تحتاج مراجعة (٧ أيام من غير تسليم)</option><option value="added">المضافة حديثًا</option></select>
-<select id="yr"><option value="">كل السنوات</option></select><button id="kb" title="الكتايب">ك الكتايب</button><button id="pb" title="المشاريع وكتايبها">🏗️ المشاريع</button><button class="p" id="addb">+ إضافة مقايسة</button><button id="saveall">💾 حفظ البيانات</button><button id="exportExcel">⬇️ تحميل Excel</button><span class="mu" id="sync"></span></div></div>
+<select id="yr"><option value="">كل السنوات</option></select><button id="kb" title="الكتايب">ك الكتايب</button><button id="pb" title="المشاريع وكتايبها">🏗️ المشاريع</button><button id="prb" title="مقايسات فيها مشاكل">⚠️ مقايسات فيها مشاكل</button><button class="p" id="addb">+ إضافة مقايسة</button><button id="saveall">💾 حفظ البيانات</button><button id="exportExcel">⬇️ تحميل Excel</button><span class="mu" id="sync"></span></div></div>
 <div class="card fm" id="fm" hidden><h2 class="fh">إضافة مقايسة جديدة</h2><div class="fs">الحقول المعلّمة بـ * مطلوبة.</div><div class="f">
 <label>الشركة <span class="req">*</span><input id="fc" placeholder="اسم الشركة"></label><label>ك<input id="fb" placeholder="ك" value="ك "></label>
 <label class="w2">المشروع <span class="req">*</span><input id="fp" placeholder="اسم المشروع"></label>
@@ -688,6 +697,52 @@ function open_(m){
 document.getElementById('kb').onclick=()=>open_('k');
 document.getElementById('pb').onclick=()=>open_('p');
 
+
+/* ⚠️ مقايسات فيها مشاكل: تتضاف بمشكلتها وصورة، وتتقفل لما تتحل */
+let PR={l:[],tab:'open',el:null,img:null};
+const prDate=t=>{try{return new Date(t).toLocaleDateString('en-GB')}catch(e){return''}};
+async function prLoad(){const{data,error}=await sb.from('est_problems').select('*').order('created_at',{ascending:false});if(error){alert('تعذّر تحميل المشاكل: '+error.message);return}PR.l=data||[];prRender()}
+function prRender(){const e=PR.el;if(!e)return;const o=PR.l.filter(x=>x.status==='open'),d=PR.l.filter(x=>x.status==='done');
+ e.querySelector('#prt').innerHTML='<button data-pa="tab" data-t="open" class="'+(PR.tab==='open'?'on':'')+'">لسه متحلّتش ('+o.length+')</button><button data-pa="tab" data-t="done" class="'+(PR.tab==='done'?'on':'')+'">اتحلّت ('+d.length+')</button>';
+ const l=PR.tab==='open'?o:d;
+ e.querySelector('#prl').innerHTML=l.length?l.map(x=>'<div class="card"><div class="pi">'+(x.img?'<img data-pa="img" data-id="'+x.id+'" src="'+esc(x.img)+'" alt="">':'')+
+  '<div class="tx"><div><b>'+esc(x.c||'—')+'</b> · '+esc(x.p||'')+(x.b?' · '+esc(x.b):'')+' <span class="bd '+(x.status==='open'?'o">لسه متحلّتش':'d">اتحلّت')+'</span></div>'+
+  '<div class="pr">'+esc(x.problem)+'</div><div class="mu">اتضافت '+prDate(x.created_at)+(x.created_name?' — '+esc(x.created_name):'')+(x.solved_at?' · اتحلّت '+prDate(x.solved_at):'')+'</div>'+
+  '<div class="acts">'+(can('edit')?'<button data-pa="tog" data-id="'+x.id+'">'+(x.status==='open'?'✓ اتحلّت':'↩ رجّعها مشكلة')+'</button>':'')+(can('del')?'<button data-pa="del" data-id="'+x.id+'">🗑 حذف</button>':'')+'</div></div></div></div>').join('')
+  :'<div class="card mu" style="text-align:center">'+(PR.tab==='open'?'مفيش مقايسات فيها مشاكل 👍':'مفيش مشاكل اتحلّت لسه')+'</div>'}
+function prOpen(){
+ if(!PR.el){const e=document.createElement('div');e.id='prs';e.hidden=true;
+  e.innerHTML='<div class="dw"><div class="dhd"><div class="dtop"><h2>⚠️ مقايسات فيها مشاكل</h2><div style="display:flex;gap:6px">'+(can('add')?'<button data-pa="new">+ إضافة مقايسة فيها مشكلة</button>':'')+'<button data-pa="close">✕ إغلاق</button></div></div></div>'+
+  '<div class="card" id="prf" hidden><h2 class="fh">إضافة مقايسة فيها مشكلة</h2><div class="pf">'+
+  '<label>رقم المقايسة (م)<input id="prn" inputmode="numeric" placeholder="اختياري — بيملا الباقي لوحده"></label>'+
+  '<label>الشركة<input id="prc" placeholder="اسم الشركة"></label><label>ك<input id="prk" placeholder="ك"></label>'+
+  '<label class="w2">المشروع<input id="prp" placeholder="اسم المشروع"></label>'+
+  '<label class="w2">المشكلة <span class="req">*</span><textarea id="prx" placeholder="اكتب المشكلة"></textarea></label>'+
+  '<label class="w2">صورة<input id="pri" type="file" accept="image/*"><span class="mu" id="pris">اختار صورة أو الصقها بـ Ctrl+V</span></label></div>'+
+  '<div class="bar" style="margin-top:12px"><button class="p" data-pa="save" id="prsv">💾 حفظ</button><button data-pa="cancel">إلغاء</button></div></div>'+
+  '<div class="pt" id="prt"></div><div id="prl"></div></div>';
+  document.body.appendChild(e);PR.el=e;
+  const k1=$('prk');if(ME.bats&&ME.bats.length===1){k1.value='ك '+ME.bats[0];k1.readOnly=true}
+  $('prn').addEventListener('input',ev=>{const n=ev.target.value.trim();const r=n&&rows.find(x=>String(x.n)===n);if(r){$('prc').value=r.c||'';$('prp').value=r.p||'';if(!$('prk').readOnly)$('prk').value=r.b||''}});
+  $('pri').addEventListener('change',ev=>{PR.img=ev.target.files[0]||null;$('pris').textContent=PR.img?'تم اختيار الصورة ✓':''});
+  e.addEventListener('paste',ev=>{if($('prf').hidden)return;const f=[...(ev.clipboardData&&ev.clipboardData.files||[])].find(f=>/^image\//.test(f.type));if(f){PR.img=f;$('pris').textContent='تم لصق الصورة ✓'}});
+  e.addEventListener('click',async ev=>{const t=ev.target.closest('[data-pa]');if(!t)return;const a=t.dataset.pa,x=PR.l.find(y=>y.id===t.dataset.id);
+   if(a==='close'){e.hidden=true;document.body.style.overflow='';return}
+   if(a==='tab'){PR.tab=t.dataset.t;prRender();return}
+   if(a==='img'&&x){showImg(x.img);return}
+   if(a==='new'){$('prf').hidden=false;['prn','prc','prp','prx'].forEach(i=>$(i).value='');if(!$('prk').readOnly)$('prk').value='';$('pri').value='';PR.img=null;$('pris').textContent='اختار صورة أو الصقها بـ Ctrl+V';$('prx').focus();return}
+   if(a==='cancel'){$('prf').hidden=true;return}
+   if(a==='save'){const row={c:$('prc').value.trim(),p:$('prp').value.trim(),b:$('prk').value.trim(),problem:$('prx').value.trim(),created_name:ME.username};
+    if(!row.problem){alert('اكتب المشكلة');return}if(!row.c&&!row.p){alert('اكتب الشركة أو المشروع');return}
+    t.disabled=true;t.textContent='بيحفظ…';
+    try{if(PR.img)row.img=await shrink(PR.img)}catch(er){alert('تعذّر قراءة الصورة، جرّب صورة تانية');t.disabled=false;t.textContent='💾 حفظ';return}
+    const{error}=await sb.from('est_problems').insert(row);t.disabled=false;t.textContent='💾 حفظ';
+    if(error){alert('تعذّر الحفظ: '+error.message);return}$('prf').hidden=true;PR.tab='open';prLoad();return}
+   if(a==='tog'&&x){const done=x.status==='open';const{error}=await sb.from('est_problems').update({status:done?'done':'open',solved_at:done?new Date().toISOString():null}).eq('id',x.id);if(error){alert('تعذّر التعديل: '+error.message);return}prLoad();return}
+   if(a==='del'&&x){if(!await ask('حذف المشكلة دي نهائياً؟'))return;const{error}=await sb.from('est_problems').delete().eq('id',x.id);if(error){alert('تعذّر الحذف: '+error.message);return}prLoad()}});
+  document.addEventListener('keydown',ev=>{if(ev.key==='Escape'&&PR.el&&!PR.el.hidden&&!document.querySelector('.mdl')){PR.el.hidden=true;document.body.style.overflow=''}})}
+ PR.el.hidden=false;document.body.style.overflow='hidden';PR.el.scrollTop=0;prLoad()}
+document.getElementById('prb').onclick=prOpen;
 /* كروت الإحصائيات في الصفحة الرئيسية: الضغط عليها بيعرض المقايسات بتاعتها */
 const cards=[...document.querySelectorAll('.st[data-f]')];
 function syncCards(){const f=$('flt').value;cards.forEach(c=>c.classList.toggle('on',c.dataset.f===f&&f!=='all'))}
